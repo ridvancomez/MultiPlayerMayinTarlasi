@@ -14,7 +14,6 @@ public class ServerManager : MonoBehaviourPunCallbacks
 
     [Header("Yeni Oda Kurulması İçin Gerekenler")]
     [SerializeField] private TMP_InputField roomName;
-    [SerializeField] private TMP_Dropdown playerNumberDropDown;
 
     [Header("Random Oda İçin Gerekenler")]
     [SerializeField] private Button randomButton;
@@ -52,7 +51,6 @@ public class ServerManager : MonoBehaviourPunCallbacks
         onlineButton = GameObject.FindGameObjectWithTag("OnlineButton").GetComponent<Button>();
 
         roomName = GameObject.FindGameObjectWithTag("RoomName").GetComponent<TMP_InputField>();
-        playerNumberDropDown = GameObject.FindGameObjectWithTag("PlayerNumberDropDown").GetComponent<TMP_Dropdown>();
 
         randomButton = GameObject.FindGameObjectWithTag("RandomButton").GetComponent<Button>();
 
@@ -93,11 +91,11 @@ public class ServerManager : MonoBehaviourPunCallbacks
         string dateTimeNow = now.ToString("ddMMyyyyHHmms");
         PlayerPrefs.SetInt("GameDifficulty", gameDifficulty);
         string roomNameString = roomName.text + dateTimeNow;
-        int playerNumber = System.Convert.ToInt32(playerNumberDropDown.options[playerNumberDropDown.value].text);
+        int maxPlayerNumber = 2;
 
         PhotonNetwork.NickName = TextFileHandler.ReadPlayerData().PlayerName;
 
-        PhotonNetwork.JoinOrCreateRoom(roomNameString, new RoomOptions { MaxPlayers = playerNumber, IsOpen = true, IsVisible = true }, TypedLobby.Default);
+        PhotonNetwork.JoinOrCreateRoom(roomNameString, new RoomOptions { MaxPlayers = maxPlayerNumber, IsOpen = true, IsVisible = true }, TypedLobby.Default);
     }
 
 
