@@ -154,8 +154,8 @@ public class UIManager : MonoBehaviour
     /// </summary>
     private void WritePlayerMoney()
     {
-        playerKitShopPriceText.text = "Para: " + playerData.Score.ToString() + " $";
-        playerSkillShopPriceText.text = "Para: " + playerData.Score.ToString() + " $";
+        playerKitShopPriceText.text = "Para: " + playerData.Money.ToString() + " $";
+        playerSkillShopPriceText.text = "Para: " + playerData.Money.ToString() + " $";
     }
 
     private void GradualTransition(SrollSettings scrollSettings)
@@ -240,7 +240,7 @@ public class UIManager : MonoBehaviour
                     {
                         priceText.text = $"Fiyat {product[productIndex].Price}";
 
-                        priceButton.interactable = playerData.Score >= product[productIndex].Price;
+                        priceButton.interactable = playerData.Money >= product[productIndex].Price;
                     }
                     break;
                 case 2: // Face
@@ -386,9 +386,9 @@ public class UIManager : MonoBehaviour
     {
         playerData = TextFileHandler.ReadPlayerData();
 
-        heartBuyButton.interactable = playerData.Score >= heartPrice;
-        buyutecBuyButton.interactable = playerData.Score >= buyutecPrice;
-        yonDegistirmeBuyButton.interactable = playerData.Score >= yonDegistirmePrice;
+        heartBuyButton.interactable = playerData.Money >= heartPrice;
+        buyutecBuyButton.interactable = playerData.Money >= buyutecPrice;
+        yonDegistirmeBuyButton.interactable = playerData.Money >= yonDegistirmePrice;
     }
 
     public void Buy()
@@ -398,13 +398,13 @@ public class UIManager : MonoBehaviour
             case 1:
                 if (!playerData.OpenedBodysIndex.Contains(productIndex))
                 {
-                    if(playerData.Score >= bodies[productIndex].Price)
+                    if(playerData.Money >= bodies[productIndex].Price)
                     {
                         playerData.OpenedBodysIndex.Add(productIndex);
                         bodies[productIndex].Image.transform.GetChild(0).gameObject.SetActive(false);
                         playerData.OpenedBodysIndex.Sort();
 
-                        playerData.Score -= bodies[productIndex].Price;
+                        playerData.Money -= bodies[productIndex].Price;
                     }
                     else
                     {
@@ -417,13 +417,13 @@ public class UIManager : MonoBehaviour
             case 2:
                 if (!playerData.OpenedFacesIndex.Contains(productIndex))
                 {
-                    if(playerData.Score >= faces[productIndex].Price)
+                    if(playerData.Money >= faces[productIndex].Price)
                     {
                         playerData.OpenedFacesIndex.Add(productIndex);
                         faces[productIndex].Image.transform.GetChild(0).gameObject.SetActive(false);
                         playerData.OpenedFacesIndex.Sort();
 
-                        playerData.Score -= faces[productIndex].Price;
+                        playerData.Money -= faces[productIndex].Price;
                     }
                     else
                     {
@@ -436,13 +436,13 @@ public class UIManager : MonoBehaviour
             case 3:
                 if (!playerData.OpenedHairsIndex.Contains(productIndex))
                 {
-                    if(playerData.Score >= hairs[productIndex].Price)
+                    if(playerData.Money >= hairs[productIndex].Price)
                     {
                         playerData.OpenedHairsIndex.Add(productIndex);
                         hairs[productIndex].Image.transform.GetChild(0).gameObject.SetActive(false);
                         playerData.OpenedHairsIndex.Sort();
 
-                        playerData.Score -= hairs[productIndex].Price;
+                        playerData.Money -= hairs[productIndex].Price;
                     }
                     else
                     {
@@ -456,13 +456,13 @@ public class UIManager : MonoBehaviour
             case 4:
                 if (!playerData.OpenedKitsIndex.Contains(productIndex))
                 {
-                    if(playerData.Score >= kits[productIndex].Price)
+                    if(playerData.Money >= kits[productIndex].Price)
                     {
                         playerData.OpenedKitsIndex.Add(productIndex);
                         kits[productIndex].Image.transform.GetChild(0).gameObject.SetActive(false);
                         playerData.OpenedKitsIndex.Sort();
 
-                        playerData.Score -= kits[productIndex].Price;
+                        playerData.Money -= kits[productIndex].Price;
                     }
                     else
                     {
@@ -478,7 +478,7 @@ public class UIManager : MonoBehaviour
 
         playerData = TextFileHandler.ReadPlayerData();
 
-        playerKitShopPriceText.text = "Para: " + playerData.Score.ToString() + " $";
+        playerKitShopPriceText.text = "Para: " + playerData.Money.ToString() + " $";
     }
 
     public void SkillBuy(int skillId) // 0 = Heart, 1 = Buyutec, 2 = Yon Degistirme
@@ -488,15 +488,15 @@ public class UIManager : MonoBehaviour
             case 0: // Heart
                 Debug.Log("Girdi");
                 playerData.Heart++;
-                playerData.Score -= heartPrice;
+                playerData.Money -= heartPrice;
                 break;
             case 1: // Buyutec
                 playerData.CyberMagnifyingGlass++;
-                playerData.Score -= buyutecPrice;
+                playerData.Money -= buyutecPrice;
                 break;
             case 2: // Yon Degistirme
                 playerData.PassiveMove++;
-                playerData.Score -= yonDegistirmePrice;
+                playerData.Money -= yonDegistirmePrice;
                 break;
         }
         TextFileHandler.WritePlayerData(playerData);
@@ -617,7 +617,7 @@ public class UIManager : MonoBehaviour
 
     public void ChangeNick()
     {
-        PlayerData playerData = new(changeNick.text, TextFileHandler.ReadPlayerData().Score);
+        PlayerData playerData = new(changeNick.text, TextFileHandler.ReadPlayerData().Money);
 
         TextFileHandler.WritePlayerData(playerData);
 

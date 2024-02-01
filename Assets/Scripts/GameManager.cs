@@ -84,8 +84,9 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public void ToogleStopMenu() => stopPanel.SetActive(!stopPanel.activeSelf);
 
-    public void TurnMainMainMenu()
+    public virtual void TurnMainMainMenu()
     {
+
         if (PhotonNetwork.InRoom)
         {
             Destroy(FindObjectOfType<ServerManager>());
@@ -120,6 +121,11 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
     }
 
+    public void StartTimer() => StartCoroutine(Timer());
+
+    [PunRPC]
+    public void StartTimerOnRpc() => StartTimer();
+
     private void GameDifficultyLoadData(int _columnNumber, int _rowNumber, int _bombNumber, int _boxSize)
     {
         columnNumber = _columnNumber;
@@ -143,11 +149,11 @@ public class GameManager : MonoBehaviourPunCallbacks
     /// </summary>
     protected IEnumerator Timer()
     {
-        while (gameMode == GameMode.Playing)
+        while (gameMode != GameMode.Win && gameMode != GameMode.Lose)
         {
             timer++;
             yield return new WaitForSeconds(1);
-            timerText.text = timer.ToString();
+            timerText.text = timer.ToString("000");
         }
     }
 

@@ -16,7 +16,13 @@ public class GameManagerMultiplayer : GameManager
     private readonly float moveTime = 5;
     private float remainingMoveTime = 5;
     private bool isMadeMove = false;
-    
+
+    private PlayerData playerData;
+
+    [Header("Ödül Ceza Miktarı")]
+    [SerializeField] private int prizeAmount;
+    [SerializeField] private int punishAmount;
+
     private Coroutine timerCalcCoroutine;
     [Header("Kendi PlayerManager Scriptimiz")]
     public PlayerManager ThisPlayerManager;
@@ -37,6 +43,8 @@ public class GameManagerMultiplayer : GameManager
 
     private void Start()
     {
+        playerData = TextFileHandler.ReadPlayerData();
+
         FirstControl = true;
         Pw = GetComponent<PhotonView>();
         stopPanel.SetActive(false);
@@ -154,8 +162,8 @@ public class GameManagerMultiplayer : GameManager
             safeBoxes[Random.Range(0, safeBoxes.Count())].GetComponent<BoxMultiplayer>().Clicked(true);
         }
         else // Yoksa rastgele bir kareden bayrak kaldırır ve o kareyi açar
-        { 
-            List<GameObject> markedBoxes = boxes.Where(x => 
+        {
+            List<GameObject> markedBoxes = boxes.Where(x =>
             x.GetComponent<BoxMultiplayer>().BoxNode.Type == BoxType.Marked).ToList();
 
             GameObject processedBox = markedBoxes[Random.Range(0, markedBoxes.Count)];
@@ -180,6 +188,14 @@ public class GameManagerMultiplayer : GameManager
     {
         boxes.ForEach(box => box.GetComponent<BoxMultiplayer>().ChangeBoxColor(isBuyutecFeature));
     }
+
+    public override void TurnMainMainMenu()
+    {
+        PunishPlayer(punishAmount);
+
+        base.TurnMainMainMenu();
+    }
+
 
     /// <summary>
     /// Kendi playerManager scriptimzi buluyor ve eğer oyuncu sayısı tam ise oyunu başlatıyor
@@ -324,76 +340,27 @@ public class GameManagerMultiplayer : GameManager
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
-
         leavePlayerLength++;
-
-        if (PhotonNetwork.CurrentRoom.MaxPlayers != PhotonNetwork.PlayerList.Length + leavePlayerLength)
-            leavePlayerLength--;
-
-        for (int i = 0; i < ServerManager.Players.Count; i++)
+        if (PhotonNetwork.CurrentRoom.MaxPlayers == PhotonNetwork.PlayerList.Length + leavePlayerLength && GameMode != GameMode.Win && GameMode != GameMode.Lose)
         {
-            if (ServerManager.Players[i].Pw.Owner == otherPlayer)
+            if (otherPlayer == ThisPlayerManager.Pw.Owner)
             {
-                Debug.Log($"{ServerManager.Players[i].Pw.ViewID} ve {ServerManager.Players.Count}");
-
-                ServerManager.Players.Remove(ServerManager.Players[i]);
-                Debug.Log($"{ServerManager.Players.Count}");
-
-                break;
+                Pw.RPC("PunishPlayer", Pw.Owner, 100);
             }
-        }
-
-        //Oyun başladıysa
-        if (PhotonNetwork.CurrentRoom.MaxPlayers == PhotonNetwork.PlayerList.Length + leavePlayerLength)
-        {
-            //leavePlayerLength++; hatalı olduğunu düşünüyorum sonradan sildim
-            bool isTurnLeavePlayer = true;
-
-            //Sıra çıkan oyuncu da mıydı
-            for (int i = 0; i < ServerManager.Players.Count; i++)
+            else
             {
-                if (ServerManager.Players[i].PlayerNumberForGame == TurnNumber)
-                {
-                    isTurnLeavePlayer = false;
-                    break;
-                }
+                GameMode = GameMode.Win;
             }
 
-            for (int i = 0; i < PhotonNetwork.PlayerList.Length; i++)
-            {
-                if (PhotonNetwork.LocalPlayer == PhotonNetwork.PlayerList[i])
-                {
-                    ThisPlayerManager.PlayerNumberForGame = i;
-                    PlayerNumber = i + 1;
-                    break;
-                }
-            }
-
-            if (isTurnLeavePlayer)
-                Pw.RPC("FollowTurnNumber", RpcTarget.All, TurnNumber);
-        }
-        else //Oyun başlamadıysa
-        {
-            for (int i = 0; i < PhotonNetwork.PlayerList.Length; i++)
-            {
-
-                if (PhotonNetwork.LocalPlayer == PhotonNetwork.PlayerList[i])
-                {
-                    if (PhotonNetwork.LocalPlayer == ServerManager.Players[i].GetComponent<PhotonView>().Owner)
-                    {
-                        Debug.Log(ServerManager.Players[i].GetComponent<PhotonView>().ViewID);
-
-                        PlayerNumber = i;
-                        ThisPlayerManager.PlayerNumber = i + 1;
-
-                        ServerManager.Players[i].Pw.RPC("SetPlayerMain", RpcTarget.All, ThisPlayerManager.PlayerNumber, ThisPlayerManager.Pw.Owner.NickName);
-
-                        break;
-                    }
-                }
-            }
         }
     }
+
+    public void PunishPlayer(int punishAmount)
+    {
+        playerData.Money -= punishAmount;
+        TextFileHandler.WritePlayerData(playerData); //Bu satırda sıkıntı yok
+    }
+
 
     /// <summary>
     /// Diğer gelen oyunculara zorluk bilgisini iletiyor
@@ -414,8 +381,8 @@ public class GameManagerMultiplayer : GameManager
     [PunRPC]
     public void ScynBombedBox(int xcoordinat, int ycoordinat, int animalIndex)
     {
-        GameObject box = Boxes.FirstOrDefault(x => 
-        x.GetComponent<BoxMultiplayer>().BoxNode.XCoordinat == xcoordinat && 
+        GameObject box = Boxes.FirstOrDefault(x =>
+        x.GetComponent<BoxMultiplayer>().BoxNode.XCoordinat == xcoordinat &&
         x.GetComponent<BoxMultiplayer>().BoxNode.YCoordinat == ycoordinat);
 
         if (box != null)
@@ -463,7 +430,7 @@ public class GameManagerMultiplayer : GameManager
     /// Diğer oyunculara kazandın kaybettin bilgisini verir
     /// </summary>
     [PunRPC]
-    public void SycnGameMode(bool isLose) 
+    public void SycnGameMode(bool isLose)
     {
         if (isLose)
             GameMode = GameMode.Lose;
@@ -512,6 +479,12 @@ public class GameManagerMultiplayer : GameManager
     /// </summary>
     private IEnumerator ShowTheBombedBoxes(bool isWin)
     {
+        if (isWin)
+        {
+            playerData.Money += prizeAmount;
+            TextFileHandler.WritePlayerData(playerData);
+        }
+
         bool finish = true;
 
         for (int i = 0; i < Boxes.Count; i++)
@@ -547,5 +520,7 @@ public class GameManagerMultiplayer : GameManager
 
         losePanel.SetActive(!isWin);
         winPanel.SetActive(isWin);
-    }  
+
+        
+    }
 }

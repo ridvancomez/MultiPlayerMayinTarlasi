@@ -1,11 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using UnityEngine.UI;
 using Photon.Realtime;
 using TMPro;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class ServerManager : MonoBehaviourPunCallbacks
 {
@@ -41,8 +41,8 @@ public class ServerManager : MonoBehaviourPunCallbacks
 
     void Start()
     {
-        
-            DontDestroyOnLoad(gameObject);
+
+        DontDestroyOnLoad(gameObject);
 
         GameObject.FindGameObjectWithTag("UIManager").GetComponent<UIManager>().ShowAllPanels();
 
@@ -60,9 +60,9 @@ public class ServerManager : MonoBehaviourPunCallbacks
 
         PhotonNetwork.ConnectUsingSettings();
 
-        
 
-        
+
+
     }
 
     private void JoinTargetRoom(string roomName)
@@ -74,15 +74,18 @@ public class ServerManager : MonoBehaviourPunCallbacks
 
     public void JoinRandomRoom()
     {
-        PhotonNetwork.JoinRandomRoom();
+        bool enteredeRoom = PhotonNetwork.JoinRandomRoom();
 
-        PhotonNetwork.LoadLevel(2);
+        if (enteredeRoom)
+            PhotonNetwork.LoadLevel(2);
     }
 
-    public void RefResh()
+    public override void OnJoinRandomFailed(short returnCode, string message)
     {
-        randomButton.interactable = PhotonNetwork.CountOfRooms > 0;
+        Debug.Log("Failed to join a random room. Creating a new room.");
+        CreateRoom(0); // Eğer oda bulunamazsa yeni bir oda oluşturabilirsiniz.
     }
+
 
     public void CreateRoom(int gameDifficulty)
     {
@@ -147,7 +150,6 @@ public class ServerManager : MonoBehaviourPunCallbacks
     public override void OnJoinedLobby()
     {
         Debug.Log("Lobiye Girildi");
-        RefResh();
     }
 
     //Oda Listeleme İşlemleri

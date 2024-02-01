@@ -5,7 +5,7 @@ using Unity.VisualScripting;
 public class PlayerData
 {
     public string PlayerName { get; set; }
-    public int Score { get; set; }
+    public int Money { get; set; }
     /// <summary>
     /// Satın alınmış vücutlar
     /// </summary>
@@ -70,7 +70,7 @@ public class PlayerData
         PassiveMove = 5;
 
         PlayerName = playerName;
-        Score = score;
+        Money = score;
         //Score = 1000;
     }
 }

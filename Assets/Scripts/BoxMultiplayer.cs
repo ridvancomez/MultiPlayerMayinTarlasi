@@ -224,6 +224,9 @@ public class BoxMultiplayer : Box
 
             if (gameManager.GameMode == GameMode.Start || gameManager.GameMode == GameMode.Playing)
             {
+                if (gameManager.GameMode == GameMode.Start)
+                    gameManager.Pw.RPC("StartTimerOnRpc", Photon.Pun.RpcTarget.All);
+
                 toolBoxScriptMultiplayer.SetCoordinats(BoxNode.XCoordinat, BoxNode.YCoordinat, randomClicked);
             }
         }

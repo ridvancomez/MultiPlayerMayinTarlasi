@@ -115,6 +115,7 @@ public class BoxSingle : Box
             ToolBoxPositionChange();
             if (gameManager.GameMode == GameMode.Start)
             {
+                gameManager.StartTimer();
                 gameManager.GameMode = GameMode.Playing;
                 ClickedControl();
             }

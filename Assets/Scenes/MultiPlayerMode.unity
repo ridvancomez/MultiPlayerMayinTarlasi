@@ -6199,6 +6199,8 @@ MonoBehaviour:
   gameMode: 0
   isTimeFlow: 0
   toolBoxManager: {fileID: 149958880}
+  prizeAmount: 50
+  punishAmount: 100
   ThisPlayerManager: {fileID: 0}
   PlayerNumber: 0
   TurnNumber: 0
