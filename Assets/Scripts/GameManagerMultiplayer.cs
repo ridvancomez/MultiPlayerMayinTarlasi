@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine;
 using System.Linq;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class GameManagerMultiplayer : GameManager
 {
@@ -16,8 +17,6 @@ public class GameManagerMultiplayer : GameManager
     private readonly float moveTime = 5;
     private float remainingMoveTime = 5;
     private bool isMadeMove = false;
-
-    private PlayerData playerData;
 
     [Header("Ödül Ceza Miktarı")]
     [SerializeField] private int prizeAmount;
@@ -39,16 +38,27 @@ public class GameManagerMultiplayer : GameManager
     [Header("FoulAnimator")]
     [SerializeField] private Animator foulAnimator;
 
-
-
     private void Start()
     {
+        FeatureButtonControl();
         playerData = TextFileHandler.ReadPlayerData();
 
         FirstControl = true;
         Pw = GetComponent<PhotonView>();
         stopPanel.SetActive(false);
+
+        CreatePlayer();
+        JoinedRoom();
     }
+
+    public override void OnDisconnected(DisconnectCause cause)
+    {
+        if (SceneManager.GetActiveScene().buildIndex == 2)
+        {
+            PhotonNetwork.LoadLevel(0);
+        }
+    }
+
 
     /// <summary>
     /// Mayın tarlasındaki kareleri oluşturur
@@ -195,48 +205,38 @@ public class GameManagerMultiplayer : GameManager
 
         base.TurnMainMainMenu();
     }
+    /// <summary>
+    /// Playeri oluşturuyor
+    /// </summary>
+    private void CreatePlayer()
+    {
+        GameObject go = PhotonNetwork.Instantiate("PlayerPrefab", Vector2.zero, Quaternion.identity);
+        go.GetComponent<PhotonView>().Owner.NickName = TextFileHandler.ReadPlayerData().PlayerName;
+
+        ThisPlayerManager = go.GetComponent<PlayerManager>();
+        ThisPlayerManager.PlayerNumber = PhotonNetwork.PlayerList.Length - 1;
+    }
 
 
     /// <summary>
-    /// Kendi playerManager scriptimzi buluyor ve eğer oyuncu sayısı tam ise oyunu başlatıyor
+    /// eğer oyuncu sayısı tam ise oyunu başlatıyor
     /// </summary>
-    public void StartGame(int playerNumber)
+    public void StartGame()
     {
-        if (PlayerNumber == playerNumber)
+
+        if (PhotonNetwork.CurrentRoom.MaxPlayers == PhotonNetwork.PlayerList.Length)
         {
-            if (ThisPlayerManager == null)
+            if (PlayerNumber == 0)
             {
-                GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-                //Debug.Log(players.Length);
-
-                for (int i = 0; i < players.Length; i++)
-                {
-                    if (players[i].GetComponent<PlayerManager>().PlayerNumber == PlayerNumber)
-                    {
-                        ThisPlayerManager = players[i].GetComponent<PlayerManager>();
-                        ThisPlayerManager.PlayerNumberForGame = PlayerNumber;
-                        break;
-                    }
-                }
-            }
-
-            if (ThisPlayerManager == null)
-                Debug.LogError("Player Manager Bulunamadı");
-
-            if (PhotonNetwork.CurrentRoom.MaxPlayers == PhotonNetwork.PlayerList.Length)
-            {
-                if (PlayerNumber == 0)
-                {
-                    gameMode = GameMode.Start;
-                    timerCalcCoroutine = StartCoroutine(TimerCalc());
-                }
-                else
-                    ThisPlayerManager.GetComponent<PhotonView>().RPC("SetPlayerModeText", RpcTarget.All, PlayerNumber, TurnNumber, true, (float)-1);
-
+                gameMode = GameMode.Start;
+                timerCalcCoroutine = StartCoroutine(TimerCalc());
             }
             else
-                ThisPlayerManager.GetComponent<PhotonView>().RPC("SetPlayerModeText", RpcTarget.All, PlayerNumber, TurnNumber, false, (float)-1);
+                ThisPlayerManager.GetComponent<PhotonView>().RPC("SetPlayerModeText", RpcTarget.All, PlayerNumber, TurnNumber, true, (float)-1);
+
         }
+        else
+            ThisPlayerManager.GetComponent<PhotonView>().RPC("SetPlayerModeText", RpcTarget.All, PlayerNumber, TurnNumber, false, (float)-1);
     }
 
     /// <summary>
@@ -281,8 +281,10 @@ public class GameManagerMultiplayer : GameManager
     /// </summary>
     public void ToogleInfoPanel() => infoPanel.SetActive(!infoPanel.activeSelf);
 
-    public override void OnJoinedRoom()
+    private void JoinedRoom()
     {
+        Debug.Log("Buraya giriyor");
+
         if (PhotonNetwork.IsMasterClient)
         {
 
@@ -298,12 +300,14 @@ public class GameManagerMultiplayer : GameManager
             {
                 if (PhotonNetwork.LocalPlayer == PhotonNetwork.PlayerList[i])
                 {
+
                     PlayerNumber = i;
                     break;
                 }
             }
         }
-        StartGame(PlayerNumber);
+
+        StartGame();
 
         ThisPlayerManager.PlayerNumberForGame = PlayerNumber;
     }
@@ -314,11 +318,10 @@ public class GameManagerMultiplayer : GameManager
 
         if (PhotonNetwork.PlayerList.Length == PhotonNetwork.CurrentRoom.MaxPlayers)
         {
-            ExitGames.Client.Photon.Hashtable newRoomProperties = new()
-            {
-                ["IsGameStarted"] = true
-            };
-            PhotonNetwork.CurrentRoom.SetCustomProperties(newRoomProperties);
+
+            PhotonNetwork.CurrentRoom.IsOpen = false;
+            PhotonNetwork.CurrentRoom.IsVisible = false;
+
             if (PhotonNetwork.IsMasterClient)
             {
                 SelectBombedBox();
@@ -334,7 +337,7 @@ public class GameManagerMultiplayer : GameManager
         }
         Debug.Log(PlayerNumber);
 
-        StartGame(PlayerNumber);
+        StartGame();
 
     }
 
@@ -521,6 +524,6 @@ public class GameManagerMultiplayer : GameManager
         losePanel.SetActive(!isWin);
         winPanel.SetActive(isWin);
 
-        
+
     }
 }

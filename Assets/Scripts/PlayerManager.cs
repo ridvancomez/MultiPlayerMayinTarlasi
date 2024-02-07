@@ -69,26 +69,18 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IInfoMenu
     [PunRPC]
     public void SetPlayerMain(int playerNumber, string nickName)
     {
-        if (!ServerManager.Players.Contains(this))
-        {
-            ServerManager.Players.Add(this);
-
-            Debug.Log(ServerManager.Players.Count);
-        }
-
-
         PlayerNumber = playerNumber;
 
 
         playerObject = GameObject.FindGameObjectWithTag("Player" + PlayerNumber);
 
-        Debug.Log(playerObject.name);
+        //Debug.Log(playerObject.name);
         // transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = nickName;
         // transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "";
 
         transform.SetParent(playerObject.transform);
 
-        Debug.Log(nickName);
+        //Debug.Log(nickName);
         GetComponent<RectTransform>().localPosition = Vector3.zero;
 
         transform.localScale = Vector3.one;
@@ -155,12 +147,11 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IInfoMenu
     [PunRPC]
     public void SetPlayerItems(int bodyIndex, int faceIndex, int hairIndex, int kitIndex)
     {
-        ServerManager serverManager = FindObjectOfType<ServerManager>();
-
-        characterItems[0].sprite = serverManager.Bodies[bodyIndex];
-        characterItems[1].sprite = serverManager.Faces[faceIndex];
-        characterItems[2].sprite = serverManager.Hairs[hairIndex];
-        characterItems[3].sprite = serverManager.Kits[kitIndex];
+        GameManagerMultiplayer gameManagerScript = FindObjectOfType<GameManagerMultiplayer>();
+        characterItems[0].sprite = gameManagerScript.Bodies[bodyIndex];
+        characterItems[1].sprite = gameManagerScript.Faces[faceIndex];
+        characterItems[2].sprite = gameManagerScript.Hairs[hairIndex];
+        characterItems[3].sprite = gameManagerScript.Kits[kitIndex];
     }
 
 
@@ -223,14 +214,13 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IInfoMenu
     [PunRPC]
     public void SendPlayerDataRequest(string playerName, int avatarBodyIndex, int avatarFaceIndex, int avatarHairIndex, int avatarKitIndex, int heartAmount, int buyutecAmount, int yonDegistirmeAmount)
     {
-        ServerManager serverManager = FindObjectOfType<ServerManager>();
-
         Info.PlayerNameText.text = playerName;
 
-        Info.PlayerBodyImage.sprite = serverManager.Bodies[avatarBodyIndex];
-        Info.PlayerFaceImage.sprite = serverManager.Faces[avatarFaceIndex];
-        Info.PlayerHairImage.sprite = serverManager.Hairs[avatarHairIndex];
-        Info.PlayerKitImage.sprite = serverManager.Kits[avatarKitIndex];
+        GameManagerMultiplayer gameManagerScript = FindObjectOfType<GameManagerMultiplayer>();
+        Info.PlayerBodyImage.sprite = gameManager.Bodies[avatarBodyIndex];
+        Info.PlayerFaceImage.sprite = gameManager.Faces[avatarFaceIndex];
+        Info.PlayerHairImage.sprite = gameManager.Hairs[avatarHairIndex];
+        Info.PlayerKitImage.sprite = gameManager.Kits[avatarKitIndex];
 
         Info.HeartAmount.text = heartAmount.ToString();
         Info.BuyutecAmount.text = buyutecAmount.ToString();

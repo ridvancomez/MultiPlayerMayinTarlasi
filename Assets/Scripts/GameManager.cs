@@ -9,6 +9,7 @@ public enum GameDifficulty { Easy, Medium, Hard }
 public enum GameMode { Waiting, Start, Playing, Win, Lose }
 public class GameManager : MonoBehaviourPunCallbacks
 {
+    protected PlayerData playerData;
     protected GameDifficulty gameDifficulty;
     protected int timer;
     protected List<GameObject> bombBoxes = new();
@@ -48,6 +49,23 @@ public class GameManager : MonoBehaviourPunCallbacks
     [Header("Oyun Modu")]
     [SerializeField] protected GameMode gameMode;
 
+    /// <summary>
+    /// 0 = Heart, 1= Büyüteç, 2 = Pasif Hamle
+    /// </summary>
+    [Header("Yetenek Butonları")]
+    [SerializeField] protected List<Button> featureButtons;
+
+    [Header("Karakter Eşyaları")]
+    [SerializeField] protected List<Sprite> bodies;
+    [SerializeField] protected List<Sprite> faces;
+    [SerializeField] protected List<Sprite> hairs;
+    [SerializeField] protected List<Sprite> kits;
+
+    public List<Sprite> Bodies => bodies;
+    public List<Sprite> Faces => faces;
+    public List<Sprite> Hairs => hairs;
+    public List<Sprite> Kits => kits;
+
 
     /// <summary>
     /// Bu First Control ilk tıklamada işe yarıyor. Default değeri False. Kareye ilk tıklandıktan sonra eğer kare bomba ise bayrak koy bir tur sayıları yaz sonra o açılanlarında bomba olup olmadığını söyle diyor, eğer bomba değil ama etrafında bomba varsa bomba olmayanları bir seferlik daha açmaya devam ediyor
@@ -84,12 +102,31 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public void ToogleStopMenu() => stopPanel.SetActive(!stopPanel.activeSelf);
 
+
+    public void FeatureButtonControl()
+    {
+        playerData = TextFileHandler.ReadPlayerData();
+        for (int i = 0; i < featureButtons.Count; i++)
+        {
+            switch (i)
+            {
+                case 0:
+                    if (playerData.CyberMagnifyingGlass == 0)
+                        featureButtons[0].interactable = false;
+                    break;
+                case 1:
+                    if (playerData.PassiveMove == 0)
+                        featureButtons[1].interactable = false;
+                    break;
+            }
+        }
+    }
+
     public virtual void TurnMainMainMenu()
     {
 
         if (PhotonNetwork.InRoom)
         {
-            Destroy(FindObjectOfType<ServerManager>());
             PhotonNetwork.LeaveRoom();
         }
         PhotonNetwork.LoadLevel(0);
@@ -108,15 +145,15 @@ public class GameManager : MonoBehaviourPunCallbacks
         switch (gameDifficulty)
         {
             case GameDifficulty.Easy:
-                GameDifficultyLoadData(10, 16, 20, 20);
+                GameDifficultyLoadData(10, 16, 20, 28);
                 break;
 
             case GameDifficulty.Medium:
-                GameDifficultyLoadData(12, 18, 40, 19);
+                GameDifficultyLoadData(12, 18, 40, 23);
                 break;
 
             case GameDifficulty.Hard:
-                GameDifficultyLoadData(14, 20, 50, 17);
+                GameDifficultyLoadData(14, 20, 50, 20);
                 break;
         }
     }

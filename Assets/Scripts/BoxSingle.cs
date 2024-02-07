@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Linq;
 using UnityEngine.UI;
+using TMPro;
 
 public class BoxSingle : Box
 {
@@ -13,6 +14,7 @@ public class BoxSingle : Box
     {
         playerData = TextFileHandler.ReadPlayerData();
         featureManager = GameObject.FindGameObjectWithTag("FeatureManager").GetComponent<FeatureManager>();
+
         FindTableWitdh();
         FindButtonLocation();
 

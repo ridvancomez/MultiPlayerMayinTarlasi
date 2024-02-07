@@ -103,19 +103,22 @@ public class ToolBoxMultiplayer : ToolBox
     /// </summary>
     public void ChangePosition(Vector2 boxPosition)
     {
+        float halfBoxSize = gameManager.BoxSize / 2;
+        toolBoxButtonTransform.position = boxPosition;
+        Vector2 anchoredPosition = toolBoxButtonTransform.anchoredPosition;
         switch (Positions)
         {
             case Positions.Position1: //+,-
-                toolBoxButtonTransform.position = boxPosition + new Vector2(gameManager.BoxSize / 2 + 3, -gameManager.BoxSize / 2 - 3);
+                toolBoxButtonTransform.anchoredPosition = new Vector2(anchoredPosition.x + halfBoxSize, anchoredPosition.y - halfBoxSize);
                 break;
             case Positions.Position2: //-,-
-                toolBoxButtonTransform.position = boxPosition + new Vector2(-gameManager.BoxSize / 2 - 3, -gameManager.BoxSize / 2 - 3);
+                toolBoxButtonTransform.anchoredPosition = new Vector2(anchoredPosition.x - halfBoxSize, anchoredPosition.y - halfBoxSize);
                 break;
             case Positions.Position3: //-,+
-                toolBoxButtonTransform.position = boxPosition + new Vector2(-gameManager.BoxSize / 2 - 3, gameManager.BoxSize / 2 + 3);
+                toolBoxButtonTransform.anchoredPosition = new Vector2(anchoredPosition.x - halfBoxSize, anchoredPosition.y + halfBoxSize);
                 break;
             case Positions.Position4: //+,+
-                toolBoxButtonTransform.position = boxPosition + new Vector2(gameManager.BoxSize / 2 + 3, gameManager.BoxSize / 2 + 3);
+                toolBoxButtonTransform.anchoredPosition = new Vector2(anchoredPosition.x + halfBoxSize, anchoredPosition.y + halfBoxSize);
                 break;
         }
     }

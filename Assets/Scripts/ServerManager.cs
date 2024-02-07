@@ -15,81 +15,135 @@ public class ServerManager : MonoBehaviourPunCallbacks
     [Header("Yeni Oda Kurulması İçin Gerekenler")]
     [SerializeField] private TMP_InputField roomName;
 
-    [Header("Random Oda İçin Gerekenler")]
-    [SerializeField] private Button randomButton;
-
     [Header("Odaları Listelemek İçin Gerekenker")]
     [SerializeField] private GameObject roomButton;
     [SerializeField] private GameObject scrollContent;
     [SerializeField] private GameObject listRooms;
 
     private static List<RoomInfo> m_roomList = new();
-    public static List<PlayerManager> Players = new();
 
-
-    [Header("Karakter Eşyaları")] // sadece oyun oynarken kullanılacak
-    [SerializeField] private List<Sprite> bodies;
-    [SerializeField] private List<Sprite> faces;
-    [SerializeField] private List<Sprite> hairs;
-    [SerializeField] private List<Sprite> kits;
-
-
-    public List<Sprite> Bodies { get { return bodies; } }
-    public List<Sprite> Faces { get { return faces; } }
-    public List<Sprite> Hairs { get { return hairs; } }
-    public List<Sprite> Kits { get { return kits; } }
+    private bool isConnected;
+    private bool startInternetControl;
+    private bool disConnectedFlag;
+    private bool enteredDisConnected;
+    [Header("UI Manager")]
+    [SerializeField] private UIManager uiManager;
 
     void Start()
     {
-
-        DontDestroyOnLoad(gameObject);
-
-        GameObject.FindGameObjectWithTag("UIManager").GetComponent<UIManager>().ShowAllPanels();
-
+        disConnectedFlag = Time.time < 5;
+        startInternetControl = false;
+        uiManager.ShowAllPanels();
         listRooms = GameObject.FindGameObjectWithTag("ListRooms");
-
         onlineButton = GameObject.FindGameObjectWithTag("OnlineButton").GetComponent<Button>();
-
         roomName = GameObject.FindGameObjectWithTag("RoomName").GetComponent<TMP_InputField>();
-
-        randomButton = GameObject.FindGameObjectWithTag("RandomButton").GetComponent<Button>();
-
         scrollContent = GameObject.FindGameObjectWithTag("ScrollContent");
+        uiManager.ShowPanel(0);
 
-        GameObject.FindGameObjectWithTag("UIManager").GetComponent<UIManager>().ShowPanel(0);
+        StartCoroutine(CheckConnectionStatus());
+    }
 
-        PhotonNetwork.ConnectUsingSettings();
+    private void ConnectToPhoton()
+    {
+        if (!PhotonNetwork.IsConnected)
+            PhotonNetwork.ConnectUsingSettings();
+    }
 
+    public override void OnConnectedToMaster()
+    {
+        if (SceneManager.GetActiveScene().buildIndex == 0)
+            onlineButton.interactable = true;
 
+        Debug.Log("Servere Bağlandı");
+        PhotonNetwork.JoinLobby();
+        isConnected = true;
 
+    }
+
+    public override void OnDisconnected(DisconnectCause cause)
+    {
+        enteredDisConnected = true;
+        Debug.Log(enteredDisConnected);
+        if (SceneManager.GetActiveScene().buildIndex == 0)
+        {
+            if (!startInternetControl)
+            {
+                if (uiManager.IsShowPanel(2) || uiManager.IsShowPanel(3) || uiManager.IsShowPanel(4))
+                    uiManager.ShowPanel(0);
+
+                onlineButton.interactable = false;
+            }
+        }
+        if (!disConnectedFlag || isConnected)
+        {
+            switch (cause)
+            {
+                case DisconnectCause.ServerTimeout:
+                    uiManager.RunErrorPanel("Sunucu zaman aşımına uğradı");
+                    break;
+
+                case DisconnectCause.DnsExceptionOnConnect:
+                    uiManager.RunErrorPanel("İnternetinizi kontrol edin");
+                    break;
+
+                default:
+                    uiManager.RunErrorPanel("Bağlantı yok");
+                    break;
+            }
+
+            isConnected = false;
+            disConnectedFlag = true;
+        }
+        if (!startInternetControl)
+            StartCoroutine(CheckConnectionStatus());
+    }
+
+    public override void OnConnected()
+    {
+
+        if (enteredDisConnected)
+        {
+            uiManager.RunErrorPanel("Bağlantı geldi");
+            enteredDisConnected = false;
+        }
+
+        startInternetControl = false;
 
     }
 
     private void JoinTargetRoom(string roomName)
     {
         PhotonNetwork.JoinRoom(roomName);
-        PhotonNetwork.LoadLevel(2);
+    }
 
+    public override void OnJoinRoomFailed(short returnCode, string message)
+    {
+        uiManager.RunErrorPanel("Odaya giriş yapılırken sorun oluştu. Lütfen tekrar deneyin.");
     }
 
     public void JoinRandomRoom()
     {
-        bool enteredeRoom = PhotonNetwork.JoinRandomRoom();
-
-        if (enteredeRoom)
-            PhotonNetwork.LoadLevel(2);
+        if (PhotonNetwork.IsConnected)
+            PhotonNetwork.JoinRandomRoom();
     }
 
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
-        Debug.Log("Failed to join a random room. Creating a new room.");
-        CreateRoom(0); // Eğer oda bulunamazsa yeni bir oda oluşturabilirsiniz.
+        uiManager.RunErrorPanel("Rastgele odaya girilirken sorun oluştu. Yeni oda kuruluyor");
+
+        StartCoroutine(WaitAndGo(2));
+
+        float second = 0;
+
+        while (second <= 1)
+        {
+            second += Time.deltaTime;
+        }
     }
 
 
     public void CreateRoom(int gameDifficulty)
     {
-        PhotonNetwork.LoadLevel(2);
         System.DateTime now = System.DateTime.Now;
         string dateTimeNow = now.ToString("ddMMyyyyHHmms");
         PlayerPrefs.SetInt("GameDifficulty", gameDifficulty);
@@ -114,14 +168,7 @@ public class ServerManager : MonoBehaviourPunCallbacks
 
         foreach (var room in m_roomList)
         {
-            ExitGames.Client.Photon.Hashtable customPropertes = room.CustomProperties;
-            bool isClosed = false;
-            if (customPropertes.ContainsKey("IsGameStarted"))
-            {
-                isClosed = customPropertes["IsGameStarted"] is bool;
-            }
-
-            if (room.IsOpen && room.PlayerCount > 0 && !isClosed)
+            if (room.IsOpen && room.PlayerCount > 0 && room.MaxPlayers != room.PlayerCount && room.IsOpen && room.IsVisible)
             {
                 GameObject instantiatedRoomButton = Instantiate(roomButton, scrollContent.transform);
                 instantiatedRoomButton.GetComponent<Button>().onClick.AddListener(() => JoinTargetRoom(room.Name));
@@ -136,27 +183,12 @@ public class ServerManager : MonoBehaviourPunCallbacks
             scrollRectTransform.sizeDelta = new Vector2(scrollRectTransform.sizeDelta.x, size);
     }
 
-    //Server İşlemleri
-    public override void OnConnectedToMaster()
-    {
-        if (SceneManager.GetActiveScene().buildIndex == 0)
-            onlineButton.interactable = true;
-
-        Debug.Log("Servere Bağlandı");
-
-        PhotonNetwork.JoinLobby();
-    }
-
-    public override void OnJoinedLobby()
-    {
-        Debug.Log("Lobiye Girildi");
-    }
-
     //Oda Listeleme İşlemleri
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
         if (SceneManager.GetActiveScene().buildIndex != 0)
             return;
+
 
         m_roomList = roomList;
         int scrollContentHeight = 150 * roomList.Count + 30;
@@ -166,23 +198,47 @@ public class ServerManager : MonoBehaviourPunCallbacks
             ListRoomButtons();
     }
 
+
+
+    public override void OnJoinedLobby()
+    {
+        Debug.Log("Lobiye Girildi");
+    }
+
+
     public override void OnJoinedRoom()
     {
-        Debug.Log("OnJoinedRoom Çalıştı");
-        GameObject go = PhotonNetwork.Instantiate("PlayerPrefab", Vector2.zero, Quaternion.identity);
-        go.GetComponent<PhotonView>().Owner.NickName = TextFileHandler.ReadPlayerData().PlayerName;
 
-        if (PhotonNetwork.InRoom)
+        StartCoroutine(LoadLevelAfterJoin());
+    }
+
+    private IEnumerator LoadLevelAfterJoin()
+    {
+        // PhotonNetwork.LoadLevel(2); çağrısını bir Coroutine içine alıyoruz
+        PhotonNetwork.LoadLevel(2);
+
+        // Sahne yüklenene kadar bekleyelim
+        while (!PhotonNetwork.IsMasterClient || PhotonNetwork.LevelLoadingProgress < 1.0f)
         {
-            // Oyuncunun PhotonNetwork.PlayerList içindeki sırasını bulun
-            for (int i = 0; i < PhotonNetwork.PlayerList.Length; i++)
-            {
-                if (PhotonNetwork.LocalPlayer == PhotonNetwork.PlayerList[i])
-                {
-                    go.GetComponent<PlayerManager>().PlayerNumber = i;
-                    break;
-                }
-            }
+            yield return null;
         }
     }
+
+    private IEnumerator WaitAndGo(float second)
+    {
+        yield return new WaitForSeconds(second);
+        CreateRoom(0);
+    }
+
+    private IEnumerator CheckConnectionStatus()
+    {
+        startInternetControl = true;
+        while (!isConnected)
+        {
+            ConnectToPhoton();
+            yield return new WaitForSeconds(.5f);
+        }
+
+    }
+
 }

@@ -24,6 +24,7 @@ TagManager:
   - VagrantServerManager
   - FeatureManager
   - InfoData
+  - LogText
   layers:
   - Default
   - TransparentFX

@@ -97,10 +97,10 @@ public class Box : MonoBehaviourPunCallbacks
                 tableWidth = new Vector2(9, 15);
                 break;
             case 1: //Orta
-                tableWidth = new Vector2(12, 18);
+                tableWidth = new Vector2(11, 17);
                 break;
             case 2: //Zor
-                tableWidth = new Vector2(14, 20);
+                tableWidth = new Vector2(13, 19);
                 break;
         }
     }

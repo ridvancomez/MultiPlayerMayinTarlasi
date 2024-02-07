@@ -67,7 +67,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button buyutecBuyButton;
     [SerializeField] private Button yonDegistirmeBuyButton;
 
-
+    [Header("Hata Ayarları")]
+    [SerializeField] private GameObject errorPanel;
+    [SerializeField] private TextMeshProUGUI errorText;
+    [SerializeField] private float errorStayTime;
 
 
     private PlayerData playerData;
@@ -249,7 +252,6 @@ public class UIManager : MonoBehaviour
 
                         if (playerData.ActiveFaceIndex == productIndex)
                         {
-                            Debug.Log("Aktif");
                             priceText.text = "Aktif";
                             priceButton.interactable = false;
 
@@ -299,8 +301,6 @@ public class UIManager : MonoBehaviour
                         {
                             priceText.text = "Aktif";
                             priceButton.interactable = false;
-
-
                         }
                         else
                         {
@@ -315,9 +315,6 @@ public class UIManager : MonoBehaviour
                     }
                     break;
             }
-
-
-
         }
         else
         {
@@ -519,6 +516,8 @@ public class UIManager : MonoBehaviour
 
     }
 
+    public bool IsShowPanel(int index) => panels[index].activeSelf;
+
     public void ShowCharacterProduct(int _characterProductNumber) //1 = Vücut / 2 = Yüz / 3 = Saç / 4 = Kıyafet
     {
 
@@ -624,6 +623,14 @@ public class UIManager : MonoBehaviour
         StartCoroutine(ChangeNickPanel());
     }
 
+    public void RunErrorPanel(string errorContent)
+    {
+        errorText.text = errorContent;
+        errorPanel.SetActive(true);
+        errorPanel.GetComponent<Image>().color = new Color(1, 1, 1, 1);
+        StartCoroutine(CloseErrorPanel());
+    }
+
     public void Quit() => Application.Quit();
 
     private IEnumerator ChangeNickPanel()
@@ -633,5 +640,19 @@ public class UIManager : MonoBehaviour
         yield return new WaitForSeconds(2);
 
         changeNickAnimator.SetBool("Show", false);
+    }
+
+    private IEnumerator CloseErrorPanel()
+    {
+        yield return new WaitForSeconds(errorStayTime);
+
+        float errorPanelAlpha = 1;
+        while(errorPanelAlpha >= 0)
+        {
+            errorPanel.GetComponent<Image>().color = new Color(1, 1, 1, errorPanelAlpha);
+            errorPanelAlpha -= Time.deltaTime;
+            yield return null;
+        }
+        errorPanel.SetActive(false);
     }
 }

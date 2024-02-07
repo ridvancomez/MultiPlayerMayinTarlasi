@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.ConstrainedExecution;
-using Unity.VisualScripting;
+using UnityEngine;
 
 public class PlayerData
 {
     public string PlayerName { get; set; }
-    public int Money { get; set; }
+
+    private int money;
+    public int Money { get => money; set => money = value < 0 ? 0 : value; }
     /// <summary>
     /// Satın alınmış vücutlar
     /// </summary>
@@ -43,20 +45,24 @@ public class PlayerData
     /// </summary>
     public int ActiveKitIndex = 0;
 
+    private int heart;
     /// <summary>
     /// Bir özelliktir. Oyuncu hata yaptığında bu sayı eğer sıfırdan daha fazla ise bu hak otomatikman kullanılır
     /// </summary>
-    public int Heart = 0;
+    public int Heart { get => heart; set => heart = value < 0 ? 0 : value; }
 
+    private int cyberMagnifyingGlass;
     /// <summary>
     /// Bir özelliktir. Oyuncu bunu kullandığında bir kare seçiyor ve o karenin safe mi bomba mı olduğunu anlıyoruz
-    /// </summary>
-    public int CyberMagnifyingGlass = 0;
+    /// </summaary>
+    public int CyberMagnifyingGlass { get => cyberMagnifyingGlass; set => cyberMagnifyingGlass = value < 0 ? 0 : value; }
 
+
+    private int passiveMove;
     /// <summary>
     /// Bir özelliktir. Oyuncu bunu kullandığında sırasını salıyor ve sıra diğer oyuncuya geçiyor
     /// </summary>
-    public int PassiveMove = 0;
+    public int PassiveMove { get => passiveMove; set => passiveMove = value < 0 ? 0 : value; }
 
     public PlayerData(string playerName, int score)
     {

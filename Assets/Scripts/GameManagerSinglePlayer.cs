@@ -10,7 +10,7 @@ public class GameManagerSinglePlayer : GameManager
         FirstControl = true;
         gameDifficulty = (GameDifficulty)PlayerPrefs.GetInt("GameDifficulty");
         SelectDifficulty();
-
+        FeatureButtonControl();
         flagNumber = bombNumber;
 
         boxLayoutGroup.constraintCount = columnNumber;

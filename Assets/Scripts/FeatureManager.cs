@@ -58,6 +58,7 @@ public class FeatureManager : MonoBehaviour
                     PasifHamleAnimation();
                     break;
             }
+            gameManager.FeatureButtonControl();
         }
     }
 
@@ -78,6 +79,12 @@ public class FeatureManager : MonoBehaviour
         playerData = TextFileHandler.ReadPlayerData();
         buyutecStartPosition = buyutec.transform.position;
 
+        if (isMultiPlayer)
+            buyutec.GetComponent<RectTransform>().sizeDelta = Vector2.one * gameManagerMultiplayer.BoxSize;
+        else
+            buyutec.GetComponent<RectTransform>().sizeDelta = Vector2.one * gameManager.BoxSize;
+
+
         ReadFeaturesAmount();
     }
 
@@ -87,7 +94,7 @@ public class FeatureManager : MonoBehaviour
         {
             if (gameManagerMultiplayer.GameMode == GameMode.Playing)
             {
-                if(index == 1)
+                if (index == 1)
                 {
                     gameManagerMultiplayer.IsBuyutecFeature = true;
                     toolBox.ToogleToolBoxMain(false);
@@ -95,7 +102,7 @@ public class FeatureManager : MonoBehaviour
                     StartCoroutine(Timer());
                     Feature = FeaturesEnum.Buyutec;
                 }
-                else if(index == 2)
+                else if (index == 2)
                 {
                     Feature = FeaturesEnum.PasifHamle;
 
@@ -106,7 +113,7 @@ public class FeatureManager : MonoBehaviour
                     gameManagerMultiplayer.TurnNumber++;
                     gameManagerMultiplayer.Pw.RPC("FollowTurnNumber", RpcTarget.All, gameManagerMultiplayer.TurnNumber);
                 }
-                
+
             }
         }
         else
