@@ -17,8 +17,8 @@ public class FeatureManager : MonoBehaviour
     [SerializeField] private GameObject buyutec;
     [SerializeField] private float speed;
     [SerializeField] private Vector2 buyutecStartPosition;
-    private GameManagerSinglePlayer gameManager;
-    private GameManagerMultiplayer gameManagerMultiplayer;
+    [SerializeField] private GameManagerSinglePlayer gameManager;
+    [SerializeField] private GameManagerMultiplayer gameManagerMultiplayer;
     [SerializeField] private ToolBox toolBox;
     [SerializeField] private float buyutecSecond;
     [SerializeField] private float currentBuyutecSecond;
@@ -58,7 +58,11 @@ public class FeatureManager : MonoBehaviour
                     PasifHamleAnimation();
                     break;
             }
-            gameManager.FeatureButtonControl();
+            if (!isMultiPlayer)
+                gameManager.FeatureButtonControl();
+            else
+                gameManagerMultiplayer.FeatureButtonControl();
+
         }
     }
 
@@ -92,7 +96,7 @@ public class FeatureManager : MonoBehaviour
     {
         if (isMultiPlayer)
         {
-            if (gameManagerMultiplayer.GameMode == GameMode.Playing)
+            if (gameManagerMultiplayer.GameMode == GameMode.Playing && !gameManagerMultiplayer.IsBuyutecFeature)
             {
                 if (index == 1)
                 {
@@ -111,6 +115,7 @@ public class FeatureManager : MonoBehaviour
 
                     //Burada sıra numarasını bir artırıp GameManagerMultiplayerdeki FollowTurnNumber metodunu çalıştırır. Diğer kişiye bu metot sayesinde geçer
                     gameManagerMultiplayer.TurnNumber++;
+                    gameManagerMultiplayer.StopTimerCalc();
                     gameManagerMultiplayer.Pw.RPC("FollowTurnNumber", RpcTarget.All, gameManagerMultiplayer.TurnNumber);
                 }
 
@@ -224,15 +229,24 @@ public class FeatureManager : MonoBehaviour
 
         if (first)
         {
-            StartCoroutine(box.ShowTheBomb());
+            //Tutorial olmadığı için false veriyorum
+            StartCoroutine(box.ShowTheBomb(false));
         }
         else
         {
             isClicked = false;
             if (isMultiPlayer)
+            {
                 gameManagerMultiplayer.IsBuyutecFeature = false;
+                gameManagerMultiplayer.IsBuyutecFeatureRun = false;
+
+            }
             else
+            {
                 gameManager.IsBuyutecFeature = false;
+                gameManager.IsBuyutecFeatureRun = false;
+
+            }
 
             TimeManage(true);
             Feature = FeaturesEnum.None;

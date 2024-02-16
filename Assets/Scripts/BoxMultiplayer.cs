@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using System.Linq;
 using UnityEngine.UI;
 
@@ -168,25 +166,7 @@ public class BoxMultiplayer : Box
             gameManager.GameMode = GameMode.Lose;
         }
 
-
-        //eğer hiç safe kare yoksa veya işaretlenmiş olan kutuların hepsi bomba olan kutulara konulmuşsa finish true olacak
-        bool finish = true;
-
-        for (int i = 0; i < gameManager.Boxes.Count; i++)
-        {
-            Node boxNode = gameManager.Boxes[i].GetComponent<BoxMultiplayer>().BoxNode;
-            if (boxNode.Type == BoxType.Safe || (!boxNode.IsBomb && boxNode.Type == BoxType.Marked))
-            {
-                finish = false;
-                break;
-            }
-        }
-
-        if (finish)
-        {
-            gameManager.ChangeGameMode(false);
-            //gameManager.Pw.RPC("SycnGameMode", RpcTarget.Others, false);
-        }
+        IsGameOver(gameManager);
 
     }
 
@@ -214,11 +194,12 @@ public class BoxMultiplayer : Box
     //Button eventine bağlı. Kareye tıklayınca çalışan kod
     public void Clicked(bool randomClicked = false)
     {
-        if (gameManager.IsBuyutecFeature)
+        if (gameManager.IsBuyutecFeature && !gameManager.IsBuyutecFeatureRun)
         {
+            gameManager.IsBuyutecFeatureRun = true;
             FindAnyObjectByType<FeatureManager>().BuyutecChangePosition((Vector2)transform.position, this);
         }
-        else
+        else if (!gameManager.IsBuyutecFeature && !gameManager.IsBuyutecFeatureRun)
         {
             ToolBoxPositionChange();
 

@@ -143,7 +143,7 @@ public class ToolBoxSingle : ToolBox
         }
         else if (box.BoxNode.Type == BoxType.Bomb)
         {
-            if (playerData.Heart >= 0)
+            if (playerData.Heart > 0)
             {
                 featureManager.Feature = FeaturesEnum.Heart;
                 playerData.Heart--;

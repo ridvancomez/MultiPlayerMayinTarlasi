@@ -1,4 +1,5 @@
 ﻿using Photon.Pun;
+using Photon.Pun.Demo.PunBasics;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -27,7 +28,7 @@ public class Box : MonoBehaviourPunCallbacks
     /// <summary>
     /// 0 = flag, 1 = bomb, 2 = false
     /// </summary>
-    [SerializeField] protected List<GameObject> images; 
+    [SerializeField] protected List<GameObject> images;
 
     protected RectTransform rTransform;
 
@@ -89,21 +90,48 @@ public class Box : MonoBehaviourPunCallbacks
     protected void FindTableWitdh()
     {
         //Zorluk bilgisine ihtiyacım var çünkü butonImageLocationda kullanıyorum
-        int gameDifficulty = PlayerPrefs.GetInt("GameDifficulty");
-
-        switch (gameDifficulty)
+        if (PlayerPrefs.HasKey("GameDifficulty"))
         {
-            case 0: //Kolay
-                tableWidth = new Vector2(9, 15);
-                break;
-            case 1: //Orta
-                tableWidth = new Vector2(11, 17);
-                break;
-            case 2: //Zor
-                tableWidth = new Vector2(13, 19);
-                break;
+            int gameDifficulty = PlayerPrefs.GetInt("GameDifficulty");
+
+            switch (gameDifficulty)
+            {
+                case 0: //Kolay
+                    tableWidth = new Vector2(9, 15);
+                    break;
+                case 1: //Orta
+                    tableWidth = new Vector2(11, 17);
+                    break;
+                case 2: //Zor
+                    tableWidth = new Vector2(13, 19);
+                    break;
+            }
         }
+        else
+        {
+            Debug.LogError("Oyun Zorluğu Bulunamadı");
+        }
+
     }
+
+    /// <summary>
+    /// Tüm kareler açılıp sadece bomba kareler kaldıysa Game Modunu Win yapacak
+    /// </summary>
+    protected void IsGameOver(GameManager gameManager)
+    {
+        bool finish = true;
+        Node boxNode;
+        for (int i = 0; i < gameManager.Boxes.Count; i++)
+        {
+            boxNode = gameManager.Boxes[i].GetComponent<Box>().BoxNode;
+            if (boxNode.Type == BoxType.Safe || (!boxNode.IsBomb && boxNode.Type == BoxType.Marked))
+                finish = false;
+        }
+
+        if (finish)
+            gameManager.GameMode = GameMode.Win;
+    }
+
 
     /// <summary>
     /// Büyüteç feature ile bağlı bir metot. Büyütecin hangi kareyi kontrol edebileceğini renklerle belirtmek için bir coroutune başlatan metot.
@@ -161,10 +189,11 @@ public class Box : MonoBehaviourPunCallbacks
     }
 
 
+
     /// <summary>
     /// Eğer kare bomba karesi ise zamanı geldiğinde büyüteç feature bu coroutuneyi başlatır ve bomba simgesi kısa süreliğine gözükür
     /// </summary>
-    public IEnumerator ShowTheBomb()
+    public IEnumerator ShowTheBomb(bool isTutorial)
     {
         float startValue = 0f;
         float currentValue = startValue;
@@ -209,7 +238,10 @@ public class Box : MonoBehaviourPunCallbacks
             images[1].SetActive(false);
         }
 
+        if (isTutorial)
+            FindAnyObjectByType<TutorialManager>().BuyutecChangePosition();
 
-        FindAnyObjectByType<FeatureManager>().BuyutecChangePosition();
+        else
+            FindAnyObjectByType<FeatureManager>().BuyutecChangePosition();
     }
 }

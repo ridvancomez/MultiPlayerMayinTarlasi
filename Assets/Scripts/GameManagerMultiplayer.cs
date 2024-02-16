@@ -15,7 +15,7 @@ public class GameManagerMultiplayer : GameManager
     [SerializeField] private ToolBoxMultiplayer toolBoxManager;
     [Header("Zaman Ayarları")]
     private readonly float moveTime = 5;
-    private float remainingMoveTime = 5;
+    [SerializeField] private float remainingMoveTime = 5;
     private bool isMadeMove = false;
 
     [Header("Ödül Ceza Miktarı")]
@@ -201,7 +201,8 @@ public class GameManagerMultiplayer : GameManager
 
     public override void TurnMainMainMenu()
     {
-        PunishPlayer(punishAmount);
+        if (gameMode != GameMode.Win && gameMode != GameMode.Lose)
+            PunishPlayer(punishAmount);
 
         base.TurnMainMainMenu();
     }
@@ -283,8 +284,6 @@ public class GameManagerMultiplayer : GameManager
 
     private void JoinedRoom()
     {
-        Debug.Log("Buraya giriyor");
-
         if (PhotonNetwork.IsMasterClient)
         {
 
@@ -300,7 +299,6 @@ public class GameManagerMultiplayer : GameManager
             {
                 if (PhotonNetwork.LocalPlayer == PhotonNetwork.PlayerList[i])
                 {
-
                     PlayerNumber = i;
                     break;
                 }
@@ -361,7 +359,7 @@ public class GameManagerMultiplayer : GameManager
     public void PunishPlayer(int punishAmount)
     {
         playerData.Money -= punishAmount;
-        TextFileHandler.WritePlayerData(playerData); //Bu satırda sıkıntı yok
+        TextFileHandler.WritePlayerData(playerData);
     }
 
 
@@ -471,7 +469,7 @@ public class GameManagerMultiplayer : GameManager
             yield return null;
         }
 
-        if (remainingMoveTime == 0)
+        if (remainingMoveTime == 0 && TurnNumber == PlayerNumber)
         {
             PlayerPunishment();
         }

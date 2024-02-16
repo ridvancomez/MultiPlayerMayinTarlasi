@@ -45,6 +45,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     [Header("Feature Ayarları")]
     [SerializeField] protected bool isBuyutecFeature;
+    [SerializeField] protected bool isBuyutecFeatureRun;
 
     [Header("Oyun Modu")]
     [SerializeField] protected GameMode gameMode;
@@ -75,6 +76,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     internal int BoxSize { get { return boxSize; } }
     internal int FlagNumber { get { return flagNumber; } set { flagNumber = value; flagText.text = FlagNumber.ToString(); } }
     public bool IsBuyutecFeature { get { return isBuyutecFeature; } set { isBuyutecFeature = value; ChangeBoxColor(); } }
+    public bool IsBuyutecFeatureRun { get => isBuyutecFeatureRun; set => isBuyutecFeatureRun = value;  }
     internal List<GameObject> Boxes { get { return boxes; } }
     internal GameMode GameMode
     {

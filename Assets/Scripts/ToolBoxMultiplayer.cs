@@ -236,7 +236,6 @@ public class ToolBoxMultiplayer : ToolBox
             }
             else if (_box.BoxNode.Type == BoxType.Bomb)
             {
-                //_box.gameObject.GetComponent<Image>().color = Color.yellow;
                 _box.gameObject.GetComponent<Image>().color = Color.yellow;
                 if (gameManager.PlayerNumber == gameManager.TurnNumber)
                 {

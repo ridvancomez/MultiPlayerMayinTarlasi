@@ -628,6 +628,7 @@ public class UIManager : MonoBehaviour
         errorText.text = errorContent;
         errorPanel.SetActive(true);
         errorPanel.GetComponent<Image>().color = new Color(1, 1, 1, 1);
+        StopCoroutine(CloseErrorPanel());
         StartCoroutine(CloseErrorPanel());
     }
 

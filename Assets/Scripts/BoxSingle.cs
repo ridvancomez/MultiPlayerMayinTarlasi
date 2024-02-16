@@ -108,11 +108,12 @@ public class BoxSingle : Box
     /// </summary>
     public void Clicked()
     {
-        if (gameManager.IsBuyutecFeature)
+        if (gameManager.IsBuyutecFeature && !gameManager.IsBuyutecFeatureRun)
         {
+            gameManager.IsBuyutecFeatureRun = true;
             FindAnyObjectByType<FeatureManager>().BuyutecChangePosition((Vector2)transform.position, this);
         }
-        else
+        else if(!gameManager.IsBuyutecFeature && !gameManager.IsBuyutecFeatureRun)
         {
             ToolBoxPositionChange();
             if (gameManager.GameMode == GameMode.Start)
@@ -197,73 +198,7 @@ public class BoxSingle : Box
             }
         }
 
-
-
-
-        //if ((BoxNode.Type == BoxType.Safe || BoxNode.Type == BoxType.Marked) && boxNode.BombNumber == 0)
-        //{//Kutu safe4 ve etrafında herhangi bir bomba yoksa
-        //    if (boxNode.IsFirstColor)
-        //        GetComponent<Image>().sprite = buttonOpenedSpritesFirstColor[(int)imageLocation];
-        //    else
-        //        GetComponent<Image>().sprite = buttonOpenedSpritesSecondColor[(int)imageLocation];
-
-
-        //    if (BoxNode.Type == BoxType.Marked)
-        //        ToggleBoxImage(0);
-
-        //    BoxNode.Type = BoxType.Clicked;
-        //    GetComponent<Button>().interactable = false;
-
-        //    foreach (var box in neighbors)
-        //    {
-        //        box.GetComponent<BoxSingle>().ClickedControl();
-        //    }
-        //}
-        //else if ((BoxNode.Type == BoxType.Safe || BoxNode.Type == BoxType.Marked) && boxNode.BombNumber != 0)
-        //{//Kutu safe ama etrafında en az bir adet bomba varsa
-        //    bombNumberText.text = boxNode.BombNumber.ToString();
-        //    GetComponent<Button>().interactable = false;
-
-        //    if (boxNode.IsFirstColor)
-        //        GetComponent<Image>().sprite = buttonOpenedSpritesFirstColor[(int)imageLocation];
-        //    else
-        //        GetComponent<Image>().sprite = buttonOpenedSpritesSecondColor[(int)imageLocation];
-
-        //    if (BoxNode.Type == BoxType.Marked)
-        //        ToggleBoxImage(0);
-
-        //    BoxNode.Type = BoxType.Clicked;
-        //}
-        //else if (BoxNode.Type == BoxType.Bomb)
-        //{//Kutu bomba ise
-        //    if (playerData.Heart >= 0)
-        //    {
-        //        toolBoxScript.BoxMarked();
-        //        featureManager.Feature = FeaturesEnum.Heart;
-        //    }
-        //    else
-        //    {
-        //        gameManager.GameMode = GameMode.Lose;
-        //        GetComponent<Image>().color = Color.yellow;
-        //    }
-        //}
-
-
-
-        bool finish = true;
-
-        for (int i = 0; i < gameManager.Boxes.Count; i++)
-        {
-            if (gameManager.Boxes[i].GetComponent<BoxSingle>().BoxNode.Type == BoxType.Safe ||
-                (!gameManager.Boxes[i].GetComponent<BoxSingle>().BoxNode.IsBomb && gameManager.Boxes[i].GetComponent<BoxSingle>().BoxNode.Type == BoxType.Marked))
-            {
-                finish = false;
-            }
-        }
-
-        if (finish)
-            gameManager.GameMode = GameMode.Win;
-
+        IsGameOver(gameManager);
     }
 
     /// <summary>

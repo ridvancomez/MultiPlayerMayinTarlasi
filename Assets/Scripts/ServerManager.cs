@@ -6,6 +6,7 @@ using Photon.Realtime;
 using TMPro;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using Unity.Mathematics;
 
 public class ServerManager : MonoBehaviourPunCallbacks
 {
@@ -14,6 +15,7 @@ public class ServerManager : MonoBehaviourPunCallbacks
 
     [Header("Yeni Oda Kurulması İçin Gerekenler")]
     [SerializeField] private TMP_InputField roomName;
+    [SerializeField] private List<Button> createRoomButton;
 
     [Header("Odaları Listelemek İçin Gerekenker")]
     [SerializeField] private GameObject roomButton;
@@ -22,7 +24,7 @@ public class ServerManager : MonoBehaviourPunCallbacks
 
     private static List<RoomInfo> m_roomList = new();
 
-    private bool isConnected;
+    [SerializeField] private bool isConnected;
     private bool startInternetControl;
     private bool disConnectedFlag;
     private bool enteredDisConnected;
@@ -33,12 +35,8 @@ public class ServerManager : MonoBehaviourPunCallbacks
     {
         disConnectedFlag = Time.time < 5;
         startInternetControl = false;
-        uiManager.ShowAllPanels();
-        listRooms = GameObject.FindGameObjectWithTag("ListRooms");
-        onlineButton = GameObject.FindGameObjectWithTag("OnlineButton").GetComponent<Button>();
-        roomName = GameObject.FindGameObjectWithTag("RoomName").GetComponent<TMP_InputField>();
-        scrollContent = GameObject.FindGameObjectWithTag("ScrollContent");
         uiManager.ShowPanel(0);
+        onlineButton.interactable = PhotonNetwork.IsConnected;
 
         StartCoroutine(CheckConnectionStatus());
     }
@@ -141,20 +139,41 @@ public class ServerManager : MonoBehaviourPunCallbacks
         }
     }
 
+    public void RoomNameControl()
+    {
+        if (roomName.text == "")
+        {
+            createRoomButton.ForEach(button => button.interactable = false);
+        }
+        else
+        {
+            createRoomButton.ForEach(button => button.interactable = true);
+        }
+
+    }
 
     public void CreateRoom(int gameDifficulty)
     {
-        System.DateTime now = System.DateTime.Now;
-        string dateTimeNow = now.ToString("ddMMyyyyHHmms");
+        int nowMuniteSecond = (System.DateTime.Now.Minute * 1000) + System.DateTime.Now.Second;
+
+        int randomNumber = UnityEngine.Random.Range(1000, 9999);
+
+        string tag = (nowMuniteSecond + randomNumber).ToString("0000");
+
         PlayerPrefs.SetInt("GameDifficulty", gameDifficulty);
-        string roomNameString = roomName.text + dateTimeNow;
+        string roomNameString = roomName.text;
         int maxPlayerNumber = 2;
 
         PhotonNetwork.NickName = TextFileHandler.ReadPlayerData().PlayerName;
 
-        PhotonNetwork.JoinOrCreateRoom(roomNameString, new RoomOptions { MaxPlayers = maxPlayerNumber, IsOpen = true, IsVisible = true }, TypedLobby.Default);
+        PhotonNetwork.CreateRoom(roomNameString + "#" + tag, new RoomOptions { MaxPlayers = maxPlayerNumber, IsOpen = true, IsVisible = true }, TypedLobby.Default);
+        uiManager.RunErrorPanel("Oda Kuruluyor. Lütfen bekleyiniz");
     }
 
+    public override void OnCreateRoomFailed(short returnCode, string message)
+    {
+        uiManager.RunErrorPanel("Oda kurulurken hata oluştu. Lütfen Tekrar deneyiniz");
+    }
 
     public void ListRoomButtons()
     {
@@ -189,7 +208,6 @@ public class ServerManager : MonoBehaviourPunCallbacks
         if (SceneManager.GetActiveScene().buildIndex != 0)
             return;
 
-
         m_roomList = roomList;
         int scrollContentHeight = 150 * roomList.Count + 30;
         scrollContent.GetComponent<RectTransform>().sizeDelta = new Vector2(scrollContent.GetComponent<RectTransform>().sizeDelta.x, scrollContentHeight);
@@ -197,7 +215,6 @@ public class ServerManager : MonoBehaviourPunCallbacks
         if (listRooms.activeSelf)
             ListRoomButtons();
     }
-
 
 
     public override void OnJoinedLobby()
@@ -208,7 +225,6 @@ public class ServerManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
-
         StartCoroutine(LoadLevelAfterJoin());
     }
 
