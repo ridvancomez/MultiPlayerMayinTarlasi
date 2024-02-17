@@ -108,7 +108,7 @@ public class BoxSingle : Box
     /// </summary>
     public void Clicked()
     {
-        if (gameManager.IsBuyutecFeature && !gameManager.IsBuyutecFeatureRun)
+        if (gameManager.IsBuyutecFeature && !gameManager.IsBuyutecFeatureRun && boxNode.Type != BoxType.Marked)
         {
             gameManager.IsBuyutecFeatureRun = true;
             FindAnyObjectByType<FeatureManager>().BuyutecChangePosition((Vector2)transform.position, this);

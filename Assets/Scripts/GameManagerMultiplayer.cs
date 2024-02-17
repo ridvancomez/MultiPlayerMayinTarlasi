@@ -140,7 +140,7 @@ public class GameManagerMultiplayer : GameManager
 
                         boxScript.BoxNode.Type = BoxType.Bomb;
                         boxScript.BoxNode.IsBomb = true;
-                        boxScript.gameObject.GetComponent<Image>().color = Color.blue;
+                        //boxScript.gameObject.GetComponent<Image>().color = Color.blue;
 
                     }
                 }

@@ -128,11 +128,7 @@ public class FeatureManager : MonoBehaviour
             currentBuyutecSecond = buyutecSecond;
             StartCoroutine(Timer());
             Feature = FeaturesEnum.Buyutec;
-
         }
-
-
-
     }
 
     public void BuyutecChangePosition(Vector2 newPosition, Box box)

@@ -8,6 +8,30 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
+    [System.Serializable]
+    private class SrollSettings
+    {
+        public ScrollRect ScrollRect;
+        public float StartSize = -400;
+        public float StepSize = 805f; // Adım büyüklüğü
+        public float SmoothTime = 0.3f; // Pürüzsüz kaydırma süresi
+        public float SnapSpeed;
+
+        public float SnapForce;
+
+        public float CurrentPosition;
+    }
+
+    [System.Serializable]
+    private class Products
+    {
+        public int Price;
+        public GameObject Image;
+
+        public Sprite GetImageSprite => Image.GetComponent<Image>().sprite;
+    }
+
+
     [SerializeField] private ServerManager serverManager;
 
     [SerializeField] private TMP_InputField newNick;
@@ -75,28 +99,7 @@ public class UIManager : MonoBehaviour
 
     private PlayerData playerData;
 
-    [System.Serializable]
-    private class SrollSettings
-    {
-        public ScrollRect ScrollRect;
-        public float StartSize = -400;
-        public float StepSize = 805f; // Adım büyüklüğü
-        public float SmoothTime = 0.3f; // Pürüzsüz kaydırma süresi
-        public float SnapSpeed;
-
-        public float SnapForce;
-
-        public float CurrentPosition;
-    }
-
-    [System.Serializable]
-    private class Products
-    {
-        public int Price;
-        public GameObject Image;
-
-        public Sprite GetImageSprite => Image.GetComponent<Image>().sprite;
-    }
+    
     private void Awake()
     {
 
@@ -611,7 +614,7 @@ public class UIManager : MonoBehaviour
 
         newNickPanel.SetActive(false);
 
-
+        StartCoroutine(GoToTutorialMode());
     }
 
     public void ChangeNick()
@@ -655,5 +658,13 @@ public class UIManager : MonoBehaviour
             yield return null;
         }
         errorPanel.SetActive(false);
+    }
+
+    private IEnumerator GoToTutorialMode()
+    {
+        yield return new WaitForSeconds(.25f);
+        RunErrorPanel("Öğreticiye yönlendiriliyorsunuz. Lütfen bekleyiniz...");
+        yield return new WaitForSeconds(3f);
+        SceneManager.LoadScene(3);
     }
 }

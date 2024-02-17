@@ -140,8 +140,7 @@ public class Box : MonoBehaviourPunCallbacks
 
     public void ChangeBoxColor(bool isFeature)
     {
-        if (boxNode.Type != BoxType.Safe)
-            return;
+        if (boxNode.Type == BoxType.Clicked || boxNode.Type == BoxType.Marked)
         StartCoroutine(TransitionColor(isFeature));
     }
 
@@ -185,7 +184,6 @@ public class Box : MonoBehaviourPunCallbacks
         {
             GetComponent<Image>().color = new Color32(157, 157, 157, 255);
         }
-        time = 0;
     }
 
 
