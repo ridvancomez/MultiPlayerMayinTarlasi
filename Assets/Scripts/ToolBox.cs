@@ -5,18 +5,6 @@ using UnityEngine;
 public enum Positions { Position1, Position2, Position3, Position4 }
 public class ToolBox : MonoBehaviourPunCallbacks
 {
-    [SerializeField] protected FeatureManager featureManager;
-
-    [SerializeField] protected RectTransform toolBoxButtonTransform;
-    [SerializeField] protected Positions positions = Positions.Position1;
-
-    [SerializeField] protected List<GameObject> buttons;
-
-    [SerializeField] protected GameObject toolBoxMain;
-
-    [SerializeField] protected int posX;
-    [SerializeField] protected int posY;
-
     [System.Serializable]
     protected static class Coordinats
     {
@@ -30,17 +18,19 @@ public class ToolBox : MonoBehaviourPunCallbacks
         public static List<Vector2> Position4 = new List<Vector2> { new Vector2(-1, -1), new Vector2(1, -1), new Vector2(-1, 1), new Vector2(1, 1) };
     }
 
-    public void ClosedToolBox()
-    {
-        toolBoxMain.SetActive(false);
-    }
+    [SerializeField] protected FeatureManager featureManager;
+    [SerializeField] protected RectTransform toolBoxButtonTransform;
+    [SerializeField] protected Positions positions = Positions.Position1;
+    [SerializeField] protected List<GameObject> buttons;
+    [SerializeField] protected GameObject toolBoxMain;
+    [SerializeField] protected int posX;
+    [SerializeField] protected int posY;
 
+    public void ClosedToolBox() => toolBoxMain.SetActive(false);
 
-    public virtual void BoxMarked()
-    {}
+    public virtual void BoxMarked() {}
 
-    public virtual void OpenTheBox()
-    { }
+    public virtual void OpenTheBox() { }
 
     /// <summary>
     /// ToolBoxu açıp kapatır

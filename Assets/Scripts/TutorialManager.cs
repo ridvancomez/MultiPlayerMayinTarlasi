@@ -9,7 +9,6 @@ using UnityEngine.UI;
 public enum TutorialOrders { None, Welcome, MainMenu, MakeMove, MakeAnotherMove, PlaceFlag, RemoveFlag, CloseFeaturePanel, OpenFeaturePanel, ExplainBuyutec, UseBuyutec, UseHeart, MultiplayerTutorial, ViewPlayerDetails, ExplainFouls, UsePassiveMode, OpenGamePausePanel, CloseGamePausePanel, Finish }
 public class TutorialManager : ToolBox
 {
-
     //Verileri inspector paneline gir
     [System.Serializable]
     private class TutorialOrder
@@ -27,7 +26,6 @@ public class TutorialManager : ToolBox
             tutorialIsSpecificClicked = _tutorialIsSpecificClicked;
         }
     }
-
 
     [Header("Avatar Eşyaları")]
     [SerializeField] private Image face;
@@ -126,8 +124,7 @@ public class TutorialManager : ToolBox
         }
         else if (Input.GetKeyDown(KeyCode.Mouse0) && skipAfterTutorial && tutorialOrder == TutorialOrders.Finish)
         {
-            StartCoroutine(TurnTheMainMenu());
-            
+            StartCoroutine(TurnTheMainMenu());            
         }
     }
 
@@ -191,8 +188,6 @@ public class TutorialManager : ToolBox
             case TutorialOrders.Finish:
                 break;
         }
-
-
     }
 
     /// <summary>
@@ -409,7 +404,6 @@ public class TutorialManager : ToolBox
 
     private IEnumerator OpenInfoPanel()
     {
-
         float infoPanelAlpha = 0;
         while (infoPanelAlpha <= 1)
         {
@@ -455,18 +449,14 @@ public class TutorialManager : ToolBox
         // Başlangıç pozisyonunu kaydet
         Vector2 startPosition = buyutec.transform.position;
 
-
         float elapsedTime = 0f;
 
         while (elapsedTime < 1f)
         {
             buyutec.transform.position = Vector2.Lerp(startPosition, targetPosition, elapsedTime);
-
             elapsedTime += Time.deltaTime * speed;
-
             yield return null;
         }
-
         buyutec.transform.position = targetPosition;
 
         yield return new WaitForSeconds(.5f);

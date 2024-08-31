@@ -29,7 +29,6 @@ public class GameManagerMultiplayer : GameManager
     [Header("Sıra İşlemleri")]
     public int PlayerNumber = 0;
     public int TurnNumber = 0;
-
     public PhotonView Pw;
 
     [Header("InfoPanel")]
@@ -54,9 +53,7 @@ public class GameManagerMultiplayer : GameManager
     public override void OnDisconnected(DisconnectCause cause)
     {
         if (SceneManager.GetActiveScene().buildIndex == 2)
-        {
             PhotonNetwork.LoadLevel(0);
-        }
     }
 
 
@@ -140,13 +137,10 @@ public class GameManagerMultiplayer : GameManager
 
                         boxScript.BoxNode.Type = BoxType.Bomb;
                         boxScript.BoxNode.IsBomb = true;
-                        //boxScript.gameObject.GetComponent<Image>().color = Color.blue;
-
                     }
                 }
             }
         }
-
         boxes.ForEach(box => box.GetComponent<BoxMultiplayer>().FindBombBoxes());
     }
 
@@ -224,7 +218,6 @@ public class GameManagerMultiplayer : GameManager
     /// </summary>
     public void StartGame()
     {
-
         if (PhotonNetwork.CurrentRoom.MaxPlayers == PhotonNetwork.PlayerList.Length)
         {
             if (PlayerNumber == 0)
@@ -333,10 +326,7 @@ public class GameManagerMultiplayer : GameManager
                 }
             }
         }
-        Debug.Log(PlayerNumber);
-
         StartGame();
-
     }
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
@@ -345,14 +335,10 @@ public class GameManagerMultiplayer : GameManager
         if (PhotonNetwork.CurrentRoom.MaxPlayers == PhotonNetwork.PlayerList.Length + leavePlayerLength && GameMode != GameMode.Win && GameMode != GameMode.Lose)
         {
             if (otherPlayer == ThisPlayerManager.Pw.Owner)
-            {
                 Pw.RPC("PunishPlayer", Pw.Owner, 100);
-            }
-            else
-            {
-                GameMode = GameMode.Win;
-            }
 
+            else
+                GameMode = GameMode.Win;
         }
     }
 
@@ -392,11 +378,9 @@ public class GameManagerMultiplayer : GameManager
 
             boxScript.BoxNode.Type = BoxType.Bomb;
             boxScript.BoxNode.IsBomb = true;
-
             boxScript.ChangeBombAnimal(animalIndex);
 
             bombBoxes.Add(box);
-
             boxes.ForEach(box => { box.GetComponent<BoxMultiplayer>().FindBombBoxes(); });
         }
     }
@@ -470,9 +454,7 @@ public class GameManagerMultiplayer : GameManager
         }
 
         if (remainingMoveTime == 0 && TurnNumber == PlayerNumber)
-        {
             PlayerPunishment();
-        }
     }
 
     /// <summary>
@@ -521,7 +503,5 @@ public class GameManagerMultiplayer : GameManager
 
         losePanel.SetActive(!isWin);
         winPanel.SetActive(isWin);
-
-
     }
 }

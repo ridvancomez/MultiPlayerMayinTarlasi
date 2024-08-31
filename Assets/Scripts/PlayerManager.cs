@@ -1,14 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.UI;
 
-
 public class PlayerManager : MonoBehaviourPunCallbacks, IInfoMenu
 {
-
     private GameManagerMultiplayer gameManager;
     private PlayerData playerData;
 
@@ -20,13 +17,10 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IInfoMenu
     private GameObject playerObject;
 
     public PhotonView Pw;
-
     //Oyunda hangi kutuda yer almamız gerektiğini tutuyor
     public int PlayerNumber = 0;
-
     //Sıramızı tutuyor
     public int PlayerNumberForGame;
-
     //IINfo Menu interface inden gelen property - field  lar
     public InfoData Info { get; set; }
 
@@ -48,8 +42,6 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IInfoMenu
         //IInfo interfaceinden gelen değişkenlere veri ataması
         Info = GameObject.FindGameObjectWithTag("InfoData").GetComponent<InfoData>();
     }
-
-
     private void CloseEventImage() => Pw.RPC("ShowEventImage", RpcTarget.All, -1);
 
 
@@ -70,19 +62,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IInfoMenu
     public void SetPlayerMain(int playerNumber, string nickName)
     {
         PlayerNumber = playerNumber;
-
-
         playerObject = GameObject.FindGameObjectWithTag("Player" + PlayerNumber);
-
-        //Debug.Log(playerObject.name);
-        // transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = nickName;
-        // transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "";
-
         transform.SetParent(playerObject.transform);
-
-        //Debug.Log(nickName);
         GetComponent<RectTransform>().localPosition = Vector3.zero;
-
         transform.localScale = Vector3.one;
     }
 
@@ -94,50 +76,34 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IInfoMenu
     public void SetPlayerModeText(int playerNumber, int turnNumber, bool maxPlayer, float time)
     {
         if (playerNumber == PlayerNumber && GetComponent<PhotonView>().IsMine)
-        {
             if (maxPlayer)
-            {
                 if (playerNumber == turnNumber)
                 {
                     if (time > -1)
                         GetComponent<Image>().fillAmount = time;
-                    // else
-                    // transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "Sıra Sizde";
-
-
                     GetComponent<Image>().color = new Color32(255, 200, 0, 255);
                 }
                 else
                 {
                     GetComponent<Image>().fillAmount = 1;
-                    // transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "Sıra Bekleniyor";
                     GetComponent<Image>().color = new Color32(255, 255, 255, 255);
                 }
-            }
             else
             {
                 GetComponent<Image>().fillAmount = 1;
-                // transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "Oyuncu Bekleniyor";
                 GetComponent<Image>().color = new Color32(255, 255, 255, 255);
             }
+        else
+            if (playerNumber == turnNumber)
+        {
+            if (time > -1)
+                GetComponent<Image>().fillAmount = time;
+            GetComponent<Image>().color = new Color32(255, 200, 0, 255);
         }
         else
         {
-            if (playerNumber == turnNumber)
-            {
-                if (time > -1)
-                    GetComponent<Image>().fillAmount = time;
-                // else
-                //     transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "Sıra Sizde";
-
-                GetComponent<Image>().color = new Color32(255, 200, 0, 255);
-            }
-            else
-            {
-                GetComponent<Image>().fillAmount = 1;
-                // transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "Sıra Bekleniyor";
-                GetComponent<Image>().color = new Color32(255, 255, 255, 255);
-            }
+            GetComponent<Image>().fillAmount = 1;
+            GetComponent<Image>().color = new Color32(255, 255, 255, 255);
         }
     }
 
@@ -153,7 +119,6 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IInfoMenu
         characterItems[2].sprite = gameManagerScript.Hairs[hairIndex];
         characterItems[3].sprite = gameManagerScript.Kits[kitIndex];
     }
-
 
     /// <summary>
     /// Hangi feature kullanılıyorsa o feturenin logosunu gösterir ve bunu diğer oyunculara da gösterir
@@ -171,9 +136,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IInfoMenu
             transform.GetChild(1).GetComponent<Image>().sprite = eventSprites[eventIndex];
             transform.GetChild(1).GetComponent<Image>().color = new Color(1, 1, 1, 1);
         }
-
     }
-
 
     /// <summary>
     /// Hangi feature kullanılıyorsa o feturenin logosunu gösterir ve bunu diğer oyunculara da gösterir ve time süresi bittikten sonra kendini kapatır
@@ -195,9 +158,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IInfoMenu
 
     }
 
-
     //IInfo panelinden gelen Metotlar
-
     //Click eventinde
     public void ShowPlayerInfo()
     {
@@ -226,5 +187,4 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IInfoMenu
         Info.BuyutecAmount.text = buyutecAmount.ToString();
         Info.YonDegistirmeAmount.text = yonDegistirmeAmount.ToString();
     }
-
 }

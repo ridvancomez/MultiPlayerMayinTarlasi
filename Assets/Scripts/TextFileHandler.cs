@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using UnityEngine;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 
 public static class TextFileHandler
 {
@@ -29,7 +28,6 @@ public static class TextFileHandler
             {
                 string jsonData = File.ReadAllText(filePath);
                 PlayerData playerData = JsonConvert.DeserializeObject<PlayerData>(jsonData);
-
                 return playerData;
             }
             else

@@ -6,31 +6,19 @@ using UnityEngine.UI;
 
 public class ToolBoxMultiplayer : ToolBox
 {
-
     [Header("Ses Ayarları")]
     [SerializeField] private List<AudioSource> auidos;
     private BoxMultiplayer box;
     private GameManagerMultiplayer gameManager;
     private PhotonView pw;
-
     private PlayerData playerData;
 
-    public Positions Positions
-    {
-        get { return positions; }
-        set
-        {
-            positions = value;
-            SelectPosition();
-        }
-    }
+    public Positions Positions { get => positions; set { positions = value; SelectPosition(); } }
 
     private void Start()
     {
-
         pw = GetComponent<PhotonView>();
         gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManagerMultiplayer>();
-
         playerData = TextFileHandler.ReadPlayerData();
     }
 
@@ -43,28 +31,19 @@ public class ToolBoxMultiplayer : ToolBox
         {
             case Positions.Position1:
                 for (int i = 0; i < buttons.Count; i++)
-                {
                     buttons[i].GetComponent<RectTransform>().anchoredPosition = Coordinats.Position1[i] * new Vector2(gameManager.BoxSize / 2, gameManager.BoxSize / 2);
-
-                }
                 break;
             case Positions.Position2:
                 for (int i = 0; i < buttons.Count; i++)
-                {
                     buttons[i].GetComponent<RectTransform>().anchoredPosition = Coordinats.Position2[i] * new Vector2(gameManager.BoxSize / 2, gameManager.BoxSize / 2);
-                }
                 break;
             case Positions.Position3:
                 for (int i = 0; i < buttons.Count; i++)
-                {
                     buttons[i].GetComponent<RectTransform>().anchoredPosition = Coordinats.Position3[i] * new Vector2(gameManager.BoxSize / 2, gameManager.BoxSize / 2);
-                }
                 break;
             case Positions.Position4:
                 for (int i = 0; i < buttons.Count; i++)
-                {
                     buttons[i].GetComponent<RectTransform>().anchoredPosition = Coordinats.Position4[i] * new Vector2(gameManager.BoxSize / 2, gameManager.BoxSize / 2);
-                }
                 break;
         }
     }
@@ -77,9 +56,7 @@ public class ToolBoxMultiplayer : ToolBox
         GameObject _box = gameManager.Boxes.FirstOrDefault(x => x.GetComponent<BoxMultiplayer>().BoxNode.XCoordinat == posX && x.GetComponent<BoxMultiplayer>().BoxNode.YCoordinat == posY);
 
         if (_box != null)
-        {
             box = _box.GetComponent<BoxMultiplayer>();
-        }
     }
 
     /// <summary>
@@ -88,14 +65,10 @@ public class ToolBoxMultiplayer : ToolBox
     public void ToolBoxLoadInformation()
     {
         toolBoxButtonTransform.sizeDelta = new Vector2(gameManager.BoxSize, gameManager.BoxSize);
-
         toolBoxMain.GetComponent<RectTransform>().sizeDelta = new Vector2(gameManager.BoxSize * 2, gameManager.BoxSize * 2);
 
         foreach (var button in buttons)
-        {
             button.GetComponent<RectTransform>().sizeDelta = new Vector2(gameManager.BoxSize, gameManager.BoxSize);
-
-        }
     }
 
     /// <summary>
@@ -123,8 +96,6 @@ public class ToolBoxMultiplayer : ToolBox
         }
     }
 
-
-
     /// <summary>
     /// Tıklanan kareyi bulması için onun koordinatlarını değişkene atar
     /// </summary>
@@ -142,9 +113,7 @@ public class ToolBoxMultiplayer : ToolBox
         else
         {
             if (posX == _posX && posY == _posY)
-            {
                 ToogleToolBoxMain(!toolBoxMain.activeSelf);
-            }
             else
             {
                 ToogleToolBoxMain(true);
@@ -154,9 +123,7 @@ public class ToolBoxMultiplayer : ToolBox
             FindBox();
             buttons[2].SetActive(!(box.BoxNode.Type == BoxType.Marked));
         }
-
     }
-
 
     /// <summary>
     /// Kareyi açan metot
@@ -190,12 +157,9 @@ public class ToolBoxMultiplayer : ToolBox
                     pw.RPC("BoxMarkedPun", RpcTarget.All, box.BoxNode.XCoordinat, box.BoxNode.YCoordinat);
                 }
                 else
-                {
                     pw.RPC("OpenTheBoxPun", RpcTarget.All, box.BoxNode.XCoordinat, box.BoxNode.YCoordinat);
-                }
             }
         }
-
         gameManager.TurnNumber++;
         gameManager.Pw.RPC("FollowTurnNumber", RpcTarget.All, gameManager.TurnNumber);
     }
@@ -240,7 +204,6 @@ public class ToolBoxMultiplayer : ToolBox
                 if (gameManager.PlayerNumber == gameManager.TurnNumber)
                 {
                     gameManager.ChangeGameMode(true);
-
                     gameManager.Pw.RPC("SycnGameMode", RpcTarget.Others, false);
                 }
             }
@@ -294,5 +257,4 @@ public class ToolBoxMultiplayer : ToolBox
             }
         }
     }
-
 }

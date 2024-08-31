@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class FeatureTutorial : MonoBehaviour
@@ -11,6 +9,5 @@ public class FeatureTutorial : MonoBehaviour
         if(playerFeatureIcon != null )
             playerFeatureIcon.SetActive(false);
         tutorialManager.CloseInfoPanel();
-
     }
 }

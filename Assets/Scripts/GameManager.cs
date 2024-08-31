@@ -84,9 +84,8 @@ public class GameManager : MonoBehaviourPunCallbacks
         set
         {
             if (gameMode == GameMode.Start)
-            {
-                gameMode = value;
-            }
+            gameMode = value;
+
             else
                 gameMode = value;
 
@@ -128,9 +127,8 @@ public class GameManager : MonoBehaviourPunCallbacks
     {
 
         if (PhotonNetwork.InRoom)
-        {
             PhotonNetwork.LeaveRoom();
-        }
+
         PhotonNetwork.LoadLevel(0);
     }
 
@@ -140,9 +138,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     public void SelectDifficulty()
     {
         if (PhotonNetwork.IsMasterClient)
-        {
             gameDifficulty = (GameDifficulty)PlayerPrefs.GetInt("GameDifficulty");
-        }
 
         switch (gameDifficulty)
         {
@@ -178,10 +174,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     protected virtual void Win() { }
     protected virtual void Lose() { }
-    protected virtual void ChangeBoxColor()
-    {
-        StartCoroutine(TransitionColor(isBuyutecFeature));
-    }
+    protected virtual void ChangeBoxColor() => StartCoroutine(TransitionColor(isBuyutecFeature));
 
     /// <summary>
     /// Oyun süresini başlatır

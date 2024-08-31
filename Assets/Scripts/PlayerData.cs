@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.ConstrainedExecution;
-using UnityEngine;
 
 public class PlayerData
 {
@@ -77,6 +75,5 @@ public class PlayerData
 
         PlayerName = playerName;
         Money = score;
-        //Score = 1000;
     }
 }

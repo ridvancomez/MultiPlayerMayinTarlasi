@@ -65,8 +65,7 @@ public class GameManagerSinglePlayer : GameManager
                 boxScript.BoxNode.IsBomb = true;
                 boxScript.ChangeBombAnimal(Random.Range(0, animalSprites.Count));
 
-                bombBoxes.Add(box);
-                
+                bombBoxes.Add(box);   
             }
             else
             {
@@ -103,9 +102,5 @@ public class GameManagerSinglePlayer : GameManager
         winPanel.SetActive(isWin);
     }
 
-    protected override void ChangeBoxColor()
-    {
-        boxes.ForEach(box => box.GetComponent<BoxSingle>().ChangeBoxColor(isBuyutecFeature));
-
-    }
+    protected override void ChangeBoxColor() => boxes.ForEach(box => box.GetComponent<BoxSingle>().ChangeBoxColor(isBuyutecFeature));
 }

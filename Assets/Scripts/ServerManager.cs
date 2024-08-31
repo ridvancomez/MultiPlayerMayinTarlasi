@@ -6,11 +6,11 @@ using Photon.Realtime;
 using TMPro;
 using UnityEngine.SceneManagement;
 using System.Collections;
-using Unity.Mathematics;
 
 public class ServerManager : MonoBehaviourPunCallbacks
 {
-    //Test için Değil   
+    private static List<RoomInfo> m_roomList = new();
+
     [SerializeField] private Button onlineButton;
 
     [Header("Yeni Oda Kurulması İçin Gerekenler")]
@@ -21,15 +21,14 @@ public class ServerManager : MonoBehaviourPunCallbacks
     [SerializeField] private GameObject roomButton;
     [SerializeField] private GameObject scrollContent;
     [SerializeField] private GameObject listRooms;
-
-    private static List<RoomInfo> m_roomList = new();
-
     [SerializeField] private bool isConnected;
+    
+    [Header("UI Manager")]
+    [SerializeField] private UIManager uiManager;
+
     private bool startInternetControl;
     private bool disConnectedFlag;
     private bool enteredDisConnected;
-    [Header("UI Manager")]
-    [SerializeField] private UIManager uiManager;
 
     void Start()
     {
@@ -55,7 +54,6 @@ public class ServerManager : MonoBehaviourPunCallbacks
         Debug.Log("Servere Bağlandı");
         PhotonNetwork.JoinLobby();
         isConnected = true;
-
     }
 
     public override void OnDisconnected(DisconnectCause cause)
@@ -106,13 +104,9 @@ public class ServerManager : MonoBehaviourPunCallbacks
         }
 
         startInternetControl = false;
-
     }
 
-    private void JoinTargetRoom(string roomName)
-    {
-        PhotonNetwork.JoinRoom(roomName);
-    }
+    private void JoinTargetRoom(string roomName) => PhotonNetwork.JoinRoom(roomName);
 
     public override void OnJoinRoomFailed(short returnCode, string message)
     {
@@ -134,30 +128,21 @@ public class ServerManager : MonoBehaviourPunCallbacks
         float second = 0;
 
         while (second <= 1)
-        {
             second += Time.deltaTime;
-        }
     }
 
     public void RoomNameControl()
     {
         if (roomName.text == "")
-        {
             createRoomButton.ForEach(button => button.interactable = false);
-        }
         else
-        {
             createRoomButton.ForEach(button => button.interactable = true);
-        }
-
     }
 
     public void CreateRoom(int gameDifficulty)
     {
         int nowMuniteSecond = (System.DateTime.Now.Minute * 1000) + System.DateTime.Now.Second;
-
         int randomNumber = UnityEngine.Random.Range(1000, 9999);
-
         string tag = (nowMuniteSecond + randomNumber).ToString("0000");
 
         PlayerPrefs.SetInt("GameDifficulty", gameDifficulty);
@@ -165,7 +150,6 @@ public class ServerManager : MonoBehaviourPunCallbacks
         int maxPlayerNumber = 2;
 
         PhotonNetwork.NickName = TextFileHandler.ReadPlayerData().PlayerName;
-
         PhotonNetwork.CreateRoom(roomNameString + "#" + tag, new RoomOptions { MaxPlayers = maxPlayerNumber, IsOpen = true, IsVisible = true }, TypedLobby.Default);
         uiManager.RunErrorPanel("Oda Kuruluyor. Lütfen bekleyiniz");
     }
@@ -180,10 +164,7 @@ public class ServerManager : MonoBehaviourPunCallbacks
         GameObject[] roomButtons = GameObject.FindGameObjectsWithTag("RoomButton");
 
         foreach (var button in roomButtons)
-        {
             Destroy(button);
-
-        }
 
         foreach (var room in m_roomList)
         {
@@ -193,7 +174,6 @@ public class ServerManager : MonoBehaviourPunCallbacks
                 instantiatedRoomButton.GetComponent<Button>().onClick.AddListener(() => JoinTargetRoom(room.Name));
                 instantiatedRoomButton.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = room.Name + "\t" + room.MaxPlayers.ToString() + " / " + room.PlayerCount;
             }
-
         }
         float size = m_roomList.Count * 150;
         RectTransform scrollRectTransform = scrollContent.GetComponent<RectTransform>();
@@ -217,16 +197,10 @@ public class ServerManager : MonoBehaviourPunCallbacks
     }
 
 
-    public override void OnJoinedLobby()
-    {
-        Debug.Log("Lobiye Girildi");
-    }
+    public override void OnJoinedLobby() => Debug.Log("Lobiye Girildi");
 
 
-    public override void OnJoinedRoom()
-    {
-        StartCoroutine(LoadLevelAfterJoin());
-    }
+    public override void OnJoinedRoom() => StartCoroutine(LoadLevelAfterJoin());
 
     private IEnumerator LoadLevelAfterJoin()
     {
@@ -235,9 +209,7 @@ public class ServerManager : MonoBehaviourPunCallbacks
 
         // Sahne yüklenene kadar bekleyelim
         while (!PhotonNetwork.IsMasterClient || PhotonNetwork.LevelLoadingProgress < 1.0f)
-        {
             yield return null;
-        }
     }
 
     private IEnumerator WaitAndGo(float second)
@@ -254,7 +226,5 @@ public class ServerManager : MonoBehaviourPunCallbacks
             ConnectToPhoton();
             yield return new WaitForSeconds(.5f);
         }
-
     }
-
 }

@@ -16,7 +16,6 @@ public class InfoData : MonoBehaviour
     [SerializeField] private Image playerHairImage;
     [SerializeField] private Image playerKitImage;
 
-
     public Player InfoPlayer { get; set; }
     public GameObject InfoPanel { get => infoPanel; set => infoPanel = value; }
     public TextMeshProUGUI HeartAmount { get => heartAmount; set => heartAmount = value; }

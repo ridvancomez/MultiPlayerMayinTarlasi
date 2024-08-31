@@ -9,10 +9,8 @@ public enum FeaturesEnum { None, Heart, Buyutec, PasifHamle }
 public class FeatureManager : MonoBehaviour
 {
     [SerializeField] private bool isMultiPlayer;
-
     [SerializeField] private GameObject featurePanel;
     [SerializeField] private List<TextMeshProUGUI> featuresText; // Heart Text, BuyutecText, PasifHamleText
-
     [SerializeField] private List<Sprite> featureSprite;
     [SerializeField] private GameObject buyutec;
     [SerializeField] private float speed;
@@ -23,18 +21,14 @@ public class FeatureManager : MonoBehaviour
     [SerializeField] private float buyutecSecond;
     [SerializeField] private float currentBuyutecSecond;
     [SerializeField] private bool isClicked;
-
-    private PlayerData playerData;
-
-
-    private Box box;
-
     /// <summary>
     /// 0 = heart, 1 = PasifHamle
     /// </summary>
     [SerializeField] private Animator[] featureAnimators;
-
     [SerializeField] private FeaturesEnum feature;
+
+    private PlayerData playerData;
+    private Box box;
     public FeaturesEnum Feature
     {
         get
@@ -62,7 +56,6 @@ public class FeatureManager : MonoBehaviour
                 gameManager.FeatureButtonControl();
             else
                 gameManagerMultiplayer.FeatureButtonControl();
-
         }
     }
 
@@ -78,8 +71,6 @@ public class FeatureManager : MonoBehaviour
         else
             gameManager = manager.GetComponent<GameManagerSinglePlayer>();
 
-        Debug.Log($"isMultiplayer = {isMultiPlayer}");
-
         playerData = TextFileHandler.ReadPlayerData();
         buyutecStartPosition = buyutec.transform.position;
 
@@ -87,7 +78,6 @@ public class FeatureManager : MonoBehaviour
             buyutec.GetComponent<RectTransform>().sizeDelta = Vector2.one * gameManagerMultiplayer.BoxSize;
         else
             buyutec.GetComponent<RectTransform>().sizeDelta = Vector2.one * gameManager.BoxSize;
-
 
         ReadFeaturesAmount();
     }
@@ -118,7 +108,6 @@ public class FeatureManager : MonoBehaviour
                     gameManagerMultiplayer.StopTimerCalc();
                     gameManagerMultiplayer.Pw.RPC("FollowTurnNumber", RpcTarget.All, gameManagerMultiplayer.TurnNumber);
                 }
-
             }
         }
         else
@@ -213,7 +202,6 @@ public class FeatureManager : MonoBehaviour
         while (elapsedTime < 1f)
         {
             buyutec.transform.position = Vector2.Lerp(startPosition, targetPosition, elapsedTime);
-
             elapsedTime += Time.deltaTime * speed;
 
             yield return null;
@@ -241,7 +229,6 @@ public class FeatureManager : MonoBehaviour
             {
                 gameManager.IsBuyutecFeature = false;
                 gameManager.IsBuyutecFeatureRun = false;
-
             }
 
             TimeManage(true);
@@ -269,7 +256,5 @@ public class FeatureManager : MonoBehaviour
             TimeManage(true);
             Feature = FeaturesEnum.None;
         }
-
-
     }
 }

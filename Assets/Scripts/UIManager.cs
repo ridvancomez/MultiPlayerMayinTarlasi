@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -31,12 +30,9 @@ public class UIManager : MonoBehaviour
         public Sprite GetImageSprite => Image.GetComponent<Image>().sprite;
     }
 
-
     [SerializeField] private ServerManager serverManager;
-
     [SerializeField] private TMP_InputField newNick;
     [SerializeField] private TMP_InputField changeNick;
-
     [SerializeField] private Animator changeNickAnimator;
     [SerializeField] private GameObject newNickPanel;
     [SerializeField] private List<GameObject> panels;
@@ -59,9 +55,6 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI playerKitShopPriceText;
     [SerializeField] private Button priceButton;
     [SerializeField] private int characterProductNumber;
-
-    private int middlePanelIndex;
-    private int scrollViewIndex;
     [SerializeField] private float maxWidth;
     [SerializeField] private float contentCurrentPosX;
     // maxWidth = scrollRectShopContent.anchoredPosition.x;
@@ -96,13 +89,12 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI errorText;
     [SerializeField] private float errorStayTime;
 
-
+    private int middlePanelIndex;
+    private int scrollViewIndex;
     private PlayerData playerData;
-
     
     private void Awake()
     {
-
         if (!System.IO.File.Exists(System.IO.Path.Combine(Application.persistentDataPath, "playerDatas.json")))
         {
             newNickPanel.SetActive(true);
@@ -126,14 +118,11 @@ public class UIManager : MonoBehaviour
         for (int i = 0; i < playerData.OpenedFacesIndex.Count; i++)
             faces[playerData.OpenedFacesIndex[i]].Image.transform.GetChild(0).gameObject.SetActive(false);
 
-
         for (int i = 0; i < playerData.OpenedHairsIndex.Count; i++)
             hairs[playerData.OpenedHairsIndex[i]].Image.transform.GetChild(0).gameObject.SetActive(false);
 
         for (int i = 0; i < playerData.OpenedKitsIndex.Count; i++)
             kits[playerData.OpenedKitsIndex[i]].Image.transform.GetChild(0).gameObject.SetActive(false);
-
-
 
         WritePlayerMoney();
 
@@ -149,7 +138,6 @@ public class UIManager : MonoBehaviour
     {
         if (scrollSettingsMain.ScrollRect.gameObject.activeSelf)
             GradualTransition(scrollSettingsMain);
-
 
         if (scrollSettingsShop.ScrollRect.gameObject.activeSelf)
             GradualTransition(scrollSettingsShop);
@@ -169,16 +157,11 @@ public class UIManager : MonoBehaviour
         if (scrollSettings.ScrollRect.velocity.magnitude < 200)
         {
             scrollSettings.ScrollRect.velocity = Vector2.zero;
-
             scrollSettings.SnapSpeed = scrollSettings.SnapForce * Time.deltaTime;
-
             scrollSettings.CurrentPosition = scrollSettings.ScrollRect.content.anchoredPosition.x - scrollSettings.StartSize;
-
             int pos = (int)System.Math.Round(scrollSettings.CurrentPosition / scrollSettings.StepSize);
 
-
             scrollSettings.CurrentPosition = pos * scrollSettings.StepSize;
-
             scrollSettings.CurrentPosition += scrollSettings.StartSize;
 
             scrollSettings.ScrollRect.content.anchoredPosition = new Vector2(Mathf.MoveTowards(
@@ -186,7 +169,6 @@ public class UIManager : MonoBehaviour
                 scrollSettings.CurrentPosition, scrollSettings.SnapSpeed), scrollSettings.ScrollRect.content.anchoredPosition.y);
 
             contentCurrentPosX = scrollRectShopContent.anchoredPosition.x;
-
             productIndex = (int)(maxWidth - contentCurrentPosX) / 200;
 
             switch (characterProductNumber)
@@ -202,7 +184,6 @@ public class UIManager : MonoBehaviour
                     break;
                 case 4:
                     WritePriceText(kits, 4);
-
                     break;
                 default:
                     priceText.text = "------";
@@ -228,12 +209,10 @@ public class UIManager : MonoBehaviour
                 case 1: // Body
                     if (playerData.OpenedBodysIndex.Contains(productIndex))
                     {
-
                         if (playerData.ActiveBodyIndex == productIndex)
                         {
                             priceText.text = "Aktif";
                             priceButton.interactable = false;
-
                             UpdateCharacterFutures(1);
                         }
                         else
@@ -245,19 +224,16 @@ public class UIManager : MonoBehaviour
                     else
                     {
                         priceText.text = $"Fiyat {product[productIndex].Price}";
-
                         priceButton.interactable = playerData.Money >= product[productIndex].Price;
                     }
                     break;
                 case 2: // Face
                     if (playerData.OpenedFacesIndex.Contains(productIndex))
                     {
-
                         if (playerData.ActiveFaceIndex == productIndex)
                         {
                             priceText.text = "Aktif";
                             priceButton.interactable = false;
-
                             UpdateCharacterFutures(2);
                         }
                         else
@@ -275,13 +251,11 @@ public class UIManager : MonoBehaviour
                 case 3: // Hair
                     if (playerData.OpenedHairsIndex.Contains(productIndex))
                     {
-
                         if (playerData.ActiveHairIndex == productIndex)
                         {
                             Debug.Log("Aktif");
                             priceText.text = "Aktif";
                             priceButton.interactable = false;
-
                             UpdateCharacterFutures(3);
                         }
                         else
@@ -406,10 +380,6 @@ public class UIManager : MonoBehaviour
 
                         playerData.Money -= bodies[productIndex].Price;
                     }
-                    else
-                    {
-                        //Uyarı Mesajı burada verilecek
-                    }
                 }
                 else
                     playerData.ActiveBodyIndex = productIndex;
@@ -424,10 +394,6 @@ public class UIManager : MonoBehaviour
                         playerData.OpenedFacesIndex.Sort();
 
                         playerData.Money -= faces[productIndex].Price;
-                    }
-                    else
-                    {
-                        //Uyarı Mesajı burada verilecek
                     }
                 }
                 else
@@ -444,11 +410,6 @@ public class UIManager : MonoBehaviour
 
                         playerData.Money -= hairs[productIndex].Price;
                     }
-                    else
-                    {
-                        //Uyarı Mesajı burada verilecek
-                    }
-
                 }
                 else
                     playerData.ActiveHairIndex = productIndex;
@@ -464,10 +425,6 @@ public class UIManager : MonoBehaviour
 
                         playerData.Money -= kits[productIndex].Price;
                     }
-                    else
-                    {
-                        //Uyarı Mesajı burada verilecek
-                    }
                 }
                 else
                     playerData.ActiveKitIndex = productIndex;
@@ -475,7 +432,6 @@ public class UIManager : MonoBehaviour
         }
 
         TextFileHandler.WritePlayerData(playerData);
-
         playerData = TextFileHandler.ReadPlayerData();
 
         playerKitShopPriceText.text = "Para: " + playerData.Money.ToString() + " $";
@@ -499,8 +455,7 @@ public class UIManager : MonoBehaviour
                 playerData.Money -= yonDegistirmePrice;
                 break;
         }
-        TextFileHandler.WritePlayerData(playerData);
-        
+        TextFileHandler.WritePlayerData(playerData);        
 
         WriteSkillText();
         IsBuySkill();
@@ -512,18 +467,15 @@ public class UIManager : MonoBehaviour
         HideAllPanels();
 
         panels[index].SetActive(true);
-        if (index == 4)
-        {
-            serverManager.ListRoomButtons();
-        }
 
+        if (index == 4)
+            serverManager.ListRoomButtons();
     }
 
     public bool IsShowPanel(int index) => panels[index].activeSelf;
 
     public void ShowCharacterProduct(int _characterProductNumber) //1 = Vücut / 2 = Yüz / 3 = Saç / 4 = Kıyafet
     {
-
         characterProductNumber = _characterProductNumber;
         bodies.ForEach(body => body.Image.SetActive(false));
         faces.ForEach(face => face.Image.SetActive(false));
@@ -577,7 +529,6 @@ public class UIManager : MonoBehaviour
         }
 
         maxWidth = (scrollRectShopContent.rect.width - scrollRectShop.viewport.rect.width) / 2;
-
     }
 
     // 0,1,2 olarak üç değer alır bunun nedeni bir enum kullandığım için. 0 = Kolay, 1 = Orta, 2 = Zor
@@ -589,8 +540,7 @@ public class UIManager : MonoBehaviour
     }
 
     public void NewNick()
-    {
-        
+    {        
         PlayerData playerData = new(newNick.text, 1000);
         TextFileHandler.WritePlayerData(playerData);
         this.playerData = TextFileHandler.ReadPlayerData();
@@ -608,7 +558,6 @@ public class UIManager : MonoBehaviour
         for (int i = 0; i < playerData.OpenedKitsIndex.Count; i++)
             kits[playerData.OpenedKitsIndex[i]].Image.transform.GetChild(0).gameObject.SetActive(false);
 
-
         UpdateCharacterFutures();
         WritePlayerMoney();
 
@@ -620,7 +569,6 @@ public class UIManager : MonoBehaviour
     public void ChangeNick()
     {
         PlayerData playerData = new(changeNick.text, TextFileHandler.ReadPlayerData().Money);
-
         TextFileHandler.WritePlayerData(playerData);
 
         StartCoroutine(ChangeNickPanel());
@@ -640,9 +588,7 @@ public class UIManager : MonoBehaviour
     private IEnumerator ChangeNickPanel()
     {
         changeNickAnimator.SetBool("Show", true);
-
         yield return new WaitForSeconds(2);
-
         changeNickAnimator.SetBool("Show", false);
     }
 

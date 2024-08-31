@@ -1,6 +1,4 @@
-﻿using Photon.Pun.Demo.PunBasics;
-using Photon.Pun;
-using Photon.Realtime;
+﻿using Photon.Realtime;
 
 interface IInfoMenu
 {
