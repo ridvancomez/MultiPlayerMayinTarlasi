@@ -133,10 +133,8 @@ public class ServerManager : MonoBehaviourPunCallbacks
 
     public void RoomNameControl()
     {
-        if (roomName.text == "")
-            createRoomButton.ForEach(button => button.interactable = false);
-        else
-            createRoomButton.ForEach(button => button.interactable = true);
+        createRoomButton.ForEach(button => button.interactable = roomName.text != "");
+
     }
 
     public void CreateRoom(int gameDifficulty)
